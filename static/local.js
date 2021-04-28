@@ -8,7 +8,11 @@ var keys_down = [];
 
 
 function start_game() {
-	showAlert( "info", "New Message" );
+	let main_game = document.querySelector("#main_game");
+	main_game.classList.remove("hid");
+	setTimeout(function() {
+		main_game.classList.add("active");
+	}, 300);
 }
 
 function init() {
@@ -23,12 +27,6 @@ function init() {
 			start_game();
 		}, 300);
 	})
-
-	rpc({cmd: "ping"}, r => {
-		showAlert("okay", r.data );
-	}, err => {
-		showAlert("fail", err );
-	});
 
 	let o = {cmd: "log", msg: "Hello World!" }
 	rpc( o, console.log, console.error );
