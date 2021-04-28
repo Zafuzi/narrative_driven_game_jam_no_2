@@ -1,6 +1,22 @@
-body {
-    background: #000;
-    color: #fff;
+body, html {
+    background: none;
+    overflow: hidden;
+}
+
+#bg {
+  position: absolute;
+  top: -45px;
+  left: -45px;
+  width: calc( 100vw + 90px );
+  height: calc( 100vh + 90px );
+  display: block;
+  filter: blur(45px);
+  -webkit-filter: blur(45px);
+  background-image: url('images/undersea.jpg');
+  background-position: center center;
+  background-size: cover;
+  object-fit: cover;
+  z-index: -1;
 }
 
 #main_menu {
@@ -9,11 +25,12 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    background-color: #330088;
     color: #fff;
+    background-color: rgba(0, 0, 0, .8);
     flex-flow: column;
     opacity: 0;
     transition: opacity 0.3s ease-in-out;
+    z-index: 99;
 }
 
 #main_menu.active {
@@ -35,4 +52,31 @@ body {
     border: 2px solid #FFF;
     cursor: pointer;
     border-radius: 14px;
+}
+
+#main_game {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  grid-column-gap: 32px;
+  grid-row-gap: 32px;
+  padding: 32px;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  transition: opacity 0.3s ease-in-out;
+}
+
+#main_game.active {
+  opacity: 1;
+}
+
+#main_game div {
+  display: block;
+  background: rgba(255, 255, 255, .5);
+}
+
+#view_screen {
+  grid-column: 2 / -1;
+  grid-row: 1 / -1;
 }

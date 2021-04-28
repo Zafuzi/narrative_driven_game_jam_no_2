@@ -2,15 +2,22 @@
 <html lang="en">
 	<head>
 		<meta charset="utf-8">
-  		<meta name=viewport content="width=device-width, initial-scale=1.0">
+  		<meta name=viewport content="width=device-width, initial-scale=1.0, minimum-scale=1">
 		<title>Waterlogged</title>
 		<link href="lib.css" rel="stylesheet">
 		<link href="local.css" rel="stylesheet">
 	</head>
 	<body>
+		<div id="bg"></div>
 		<div id="main_menu">
 			<h1>Waterlogged</h1>
 			<button id="play_button">Play</button>
+		</div>
+
+		<div id="main_game" class="hid">
+			<div></div>
+			<div></div>
+			<div id="view_screen"></div>
 		</div>
 
 		<script src="sleepless.js"></script>
