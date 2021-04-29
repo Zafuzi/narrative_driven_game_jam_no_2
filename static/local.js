@@ -145,13 +145,15 @@ function power_game() {
   
   // Updates mouse pos and info!
   function update_mouse(e) {
-    mouse_x = e.clientX || e.pageX;
-    mouse_y = (e.clientY || e.pageY) - 240;
+    //mouse_x = (e.clientX || e.pageX);
+    //mouse_y = (e.clientY || e.pageY) - 240;
+    mouse_x = (e.clientX || e.pageX) - 700;
+    mouse_y = (e.clientY || e.pageY) - 120;
   }
   
   // Retrieves point pos depending on i and j (Indexes)
   function point_pos(i, j) {
-    return { x: j * 50, y: i * 50 };
+    return { x: j * tile_width, y: i * tile_height };
   }
   
   // function made to compare between drawing lines of connection and points of it!
@@ -215,6 +217,8 @@ function power_game() {
   var collided_color        = 0;
   var point_color           = -1;
   var colors_connected      = [ false, false, false, false ];
+  var tile_width            = power_game_canvas.width / 5;
+  var tile_height           = power_game_canvas.height / 5;
   
   // Handling connection idea (Rabia):
   // 1. Player clicks on point. [x] 
@@ -250,15 +254,15 @@ function power_game() {
   function draw_grid(i, j) {
     power_game_context.strokeStyle = "gray";
     power_game_context.fillStyle = "black";
-    power_game_context.fillRect(j * 50, i * 50, 50, 50);
-    power_game_context.strokeRect(j * 50, i * 50, 50, 50);
+    power_game_context.fillRect(j * tile_width, i * tile_height, tile_width, tile_height);
+    power_game_context.strokeRect(j * tile_width, i * tile_height, tile_width, tile_height);
   }
   
   function draw_connection_points(i, j) {
     if (is_connection_point(i, j)) {
       if (grid[i][j] != 0) {
         power_game_context.beginPath();
-        power_game_context.arc((j * 50) + 25, (i * 50) + 25, 25, 90, 180 * Math.PI); // Better?
+        power_game_context.arc((j * tile_width) + (tile_width / 2), (i * tile_height) + (tile_height / 2), (tile_width / 2), 90, 180 * Math.PI); // Better?
         power_game_context.closePath();
         power_game_context.fill();
       }
@@ -287,8 +291,8 @@ function power_game() {
         power_game_context.lineWidth = 15;
         power_game_context.lineJoin = "round";
         power_game_context.beginPath();
-        power_game_context.moveTo(p1.x + 25, p1.y + 25);
-        power_game_context.lineTo(p2.x + 25, p2.y + 25);
+        power_game_context.moveTo(p1.x + (tile_width / 2), p1.y + (tile_height / 2));
+        power_game_context.lineTo(p2.x + (tile_width / 2), p2.y + (tile_height / 2));
         power_game_context.closePath();
         power_game_context.stroke();
         power_game_context.lineWidth = 1;
@@ -305,11 +309,11 @@ function power_game() {
         draw_grid(i, j);
         
         // Assign i and j to mouse
-        if (AABB(mouse_x, mouse_y, 1, 1, (j * 50), (i * 50), 50, 50)) {
+        if (AABB(mouse_x, mouse_y, 1, 1, (j * tile_width), (i * tile_height), tile_width, tile_height)) {
           mouse_i = i;
           mouse_j = j;
           power_game_context.strokeStyle = "cyan";
-          power_game_context.strokeRect((j * 50), (i * 50), 50, 50);
+          power_game_context.strokeRect((j * tile_width), (i * tile_height), tile_width, tile_height);
           
           // Add point to list of points of same color
           if (point_selected && point_color >= 0) {
@@ -397,8 +401,8 @@ function power_game() {
       //console.log("p1.x: " + p1.x + ", p1.y: " + p1.y);
       //console.log("p2.x: " + p2.x + ", p2.y: " + p2.y);
       
-      var aabb_first_point = AABB(mouse_x, mouse_y, 1, 1, p1.x, p1.y, 50, 50);
-      var aabb_second_point = AABB(mouse_x, mouse_y, 1, 1, p2.x, p2.y, 50, 50);
+      var aabb_first_point = AABB(mouse_x, mouse_y, 1, 1, p1.x, p1.y, tile_width, tile_height);
+      var aabb_second_point = AABB(mouse_x, mouse_y, 1, 1, p2.x, p2.y, tile_width, tile_height);
       
       if (aabb_first_point || aabb_second_point) {
         selected_from_start     = false;
@@ -420,8 +424,8 @@ function power_game() {
       //console.log("p1.x: " + p1.x + ", p1.y: " + p1.y);
       //console.log("p2.x: " + p2.x + ", p2.y: " + p2.y);
       
-      var aabb_first_point  = AABB(mouse_x, mouse_y, 1, 1, p1.x, p1.y, 50, 50);
-      var aabb_second_point = AABB(mouse_x, mouse_y, 1, 1, p2.x, p2.y, 50, 50);
+      var aabb_first_point  = AABB(mouse_x, mouse_y, 1, 1, p1.x, p1.y, tile_width, tile_height);
+      var aabb_second_point = AABB(mouse_x, mouse_y, 1, 1, p2.x, p2.y, tile_width, tile_height);
       
       if (aabb_first_point || aabb_second_point) {
         if (aabb_first_point) {
