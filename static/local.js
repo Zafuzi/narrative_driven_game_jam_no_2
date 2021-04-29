@@ -53,15 +53,16 @@ var messages = [
 
 
 function populate_viewer( content ) {
-  console.log(content);
-  if( content[0] && content[0].id == 1 )
+  let c = Object.assign({}, content[0]); 
+  c = [c];
+  if( c[0] && c[0].id == 1 )
   {
-    content[0].content = `<canvas id="power_game" width=300 height=300></canvas>` + content[0].content;
-    r8_viewer.update( content, (e, d, i) => {
+    c[0].content = `<canvas id="power_game" width=300 height=300></canvas>` + content[0].content;
+    r8_viewer.update( c, (e, d, i) => {
       power_game();
     })
   } else {
-    r8_viewer.update( content )
+    r8_viewer.update( c )
   }
 }
 
@@ -146,6 +147,7 @@ function power_game() {
   function update_mouse(e) {
     mouse_x = e.clientX || e.pageX;
     mouse_y = (e.clientY || e.pageY) - 240;
+    console.log(mouse_x, mouse_y);
   }
   
   // Retrieves point pos depending on i and j (Indexes)
