@@ -53,8 +53,8 @@ var messages = [
 
 function populate_viewer( content ) {
   let c = Object.assign({}, content[0]); 
-  c = c;
-  if( c && c.id )
+  c = [c];
+  if( c[0] && c[0].id == 1 )
   {
     current_message = c.id;
     if( c.id == 1 ) {
@@ -149,8 +149,6 @@ function power_game() {
   
   // Updates mouse pos and info!
   function update_mouse(e) {
-    //mouse_x = (e.clientX || e.pageX);
-    //mouse_y = (e.clientY || e.pageY) - 240;
     mouse_x = (e.clientX || e.pageX) - power_game_canvas.getBoundingClientRect().left;
     mouse_y = (e.clientY || e.pageY) - power_game_canvas.getBoundingClientRect().top;
   }
@@ -194,6 +192,54 @@ function power_game() {
     }
   }
   
+  function cut_connection(c, d) {
+    selected_from_start     = false;
+    selected_from_end       = false;
+    lines[c]                = [];
+    if (d) lines[d]         = [];
+    point_selected          = false;
+    point_color             = -1;
+  }
+  
+  function matches_in_array(e, a) {
+    var matches = 0;
+    
+    for (var o = 0; o < a.length; o++) {
+      if (a[o].i == e.i && a[o].j == e.j) matches++;
+    }
+    
+    return matches;
+  }
+  
+  function check_lines_collision(c) {
+    if (lines[c].length > 1) {
+      var self_collide = false;
+      
+      // Iterate over line points, And detect similar, If found multiples of same point cut the connection directly!
+      for (var x = 0; x < lines[c].length; x++) {
+        if (matches_in_array(lines[c][x], lines[c]) > 1) {
+          self_collide = true;
+        }
+      }
+      
+      if (self_collide) {
+        cut_connection(c);
+      }
+      
+      for (var y = 1; y < lines.length; y++) {
+        if (lines[y].length > 1) {
+          for (var z = 0; z < lines[y].length; z++) {
+            for (var e = 0; e < lines[c].length; e++) {
+              if (matches_in_array(lines[c][e], lines[y]) > 1) {
+                cut_connection(c, y);
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  
   /*
   function check_victory() {
     var matches = 0;
@@ -221,6 +267,8 @@ function power_game() {
   var collided_color        = 0;
   var point_color           = -1;
   var colors_connected      = [ false, false, false, false ];
+  var colors_pal1           = [ "blank", "red", "green", "blue", "yellow" ];
+  var colors_pal2           = [ "red", "green", "blue", "yellow", "blank" ];
   var tile_width            = power_game_canvas.width / 5;
   var tile_height           = power_game_canvas.height / 5;
   
@@ -233,9 +281,8 @@ function power_game() {
   // 6. Check for connecting point with point at end. [x]
   
   // TODO:
-  // 1. Disallow diagonal movement (Without corrupt connecting).
-  // 2. Reset line if collision with other lines of other colors or with same line itself.
-  // 3. Better way to detect victory!
+  // 1. Is there better way to move line by back than using pop?
+  // 2. Better way to detect victory?
   var lines = [ [], [], [], [] ];
   
   var colors_points = [
@@ -275,17 +322,7 @@ function power_game() {
   
   function draw_connection_lines(lines) {
     for (var i = 0; i < lines.length; i++) {
-      if (i == 0) {
-        power_game_context.strokeStyle = "red";
-      } else if (i == 1) {
-        power_game_context.strokeStyle = "green";
-      } else if (i == 2) {
-        power_game_context.strokeStyle = "blue";
-      } else if (i == 3) {
-        power_game_context.strokeStyle = "yellow";
-      } else {
-        power_game_context.strokeStyle = "blank";  // Don't draw anything else!
-      }
+      power_game_context.strokeStyle = colors_pal2[i];
       
       for (var j = 1; j < lines[i].length; j++) {
         var p1 = point_pos(lines[i][j - 1].i, lines[i][j - 1].j);
@@ -335,17 +372,27 @@ function power_game() {
               
             if (grid[mouse_i][mouse_j] == 0 || grid[mouse_i][mouse_j] - 1 == point_color) {
               if (point_obj.i != mouse_i || point_obj.j != mouse_j) {
-                lines[point_color].push({ i : mouse_i, j: mouse_j });
-              }/* else {
+                // If not diagonal, Push!
+                var not_diagonal_1 = (mouse_i - point_obj.i != 0 && mouse_j - point_obj.j == 0);
+                var not_diagonal_2 = (mouse_i - point_obj.i == 0 && mouse_j - point_obj.j != 0);
+                
+                if (not_diagonal_1 || not_diagonal_2) lines[point_color].push({ i : mouse_i, j: mouse_j });
+              
+              } else {
                 lines[point_color].pop();
-              }*/
+              }
               
             } else {
               if (point_obj.i != mouse_i || point_obj.j != mouse_j) {
-                lines[point_color].push({ i : mouse_i, j: mouse_j });
-              }/* else {
+                // If not diagonal, Push!
+                var not_diagonal_1 = (mouse_i - point_obj.i != 0 && mouse_j - point_obj.j == 0);
+                var not_diagonal_2 = (mouse_i - point_obj.i == 0 && mouse_j - point_obj.j != 0);
+                
+                if (not_diagonal_1 || not_diagonal_2) lines[point_color].push({ i : mouse_i, j: mouse_j });
+              
+              } else {
                 lines[point_color].pop();
-              }*/
+              }
               
               lines[collided_color] = [];
               lines[point_color] = [];
@@ -354,19 +401,7 @@ function power_game() {
           }
         }
         
-        let color = "black";
-        if (grid[i][j] == 1) {
-            color = "red";
-        } else if (grid[i][j] == 2) {
-            color = "green";
-        } else if (grid[i][j] == 3) {
-            color = "blue";
-        } else if (grid[i][j] == 4) {
-            color = "yellow";
-        }
-
-        power_game_context.fillStyle = color;
-        
+        power_game_context.fillStyle = colors_pal1[grid[i][j]]; 
         draw_connection_points(i, j);
       }
       draw_connection_lines(lines);
@@ -378,12 +413,14 @@ function power_game() {
     
     for (var x = 0; x < colors_connected.length; x++) {
       if (check_connection(x)) matches++;
+      
       // console log is very very slow operation when done lot and lots of times
       // console.log("color " + x + " connected: " + colors_connected[x]);
     }
     
     // console.log(matches);
-    if (matches == colors_connected.length) alert("YOU WON!");
+    if (point_color != -1) check_lines_collision(point_color);
+    if (matches == colors_connected.length) showAlert("okay", "You win!");
   }
   
   function loop() {
@@ -394,7 +431,7 @@ function power_game() {
     //if (logs++ == 20) console.log(lines[0]);
   }
   
-  power_game_canvas.onmousemove = update_mouse; 
+  power_game_canvas.onmousemove = function(e) { update_mouse(e); };
   
   power_game_canvas.ondblclick = function(e) {
     update_mouse(e);
@@ -410,11 +447,7 @@ function power_game() {
       var aabb_second_point = AABB(mouse_x, mouse_y, 1, 1, p2.x, p2.y, tile_width, tile_height);
       
       if (aabb_first_point || aabb_second_point) {
-        selected_from_start     = false;
-        selected_from_end       = false;
-        lines[i]                = []; // Clear!
-        point_selected          = false;
-        point_color             = i;
+        cut_connection(i);
       }
     }
   }
