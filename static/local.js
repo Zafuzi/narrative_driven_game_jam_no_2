@@ -18,11 +18,12 @@ var messages = [
 		visible: 1,
 		content: `
 			<h3>Welcome to URS-1A</h3>
-			Abigail here! Hope you are settling in well. I know the first night down here can be a bit lonely, so I sent you my favorite song. It's not much company, but it's better than nothing!
-
-			See ya around :)
-
-			Abigail Treace
+			<br/>
+			<p>Abigail here! Hope you are settling in well. I know the first night down here can be a bit lonely, so I sent you my favorite song. It's not much company, but it's better than nothing!</p>
+			<br/>
+			<p>See ya around :)</p>
+			<br/>
+			<em>Abigail Treace</em>
 		`
 	},
 	{ 
@@ -76,7 +77,6 @@ function start_game() {
 	let a = [];
 	messages.filter(a => a.visible).reverse().forEach(m => {
 		m.class = m.read ? "message_read" : "";
-		m.trim_content = markup(m.content.slice(0, 120));
 		a.push(m);
 	})
 	r8_message.update(a, (e, d, i) => {
