@@ -350,17 +350,18 @@ function power_game() {
           }
         }
         
+        let color = "black";
         if (grid[i][j] == 1) {
-          power_game_context.fillStyle = "red";
+            color = "red";
         } else if (grid[i][j] == 2) {
-          power_game_context.fillStyle = "green";
+            color = "green";
         } else if (grid[i][j] == 3) {
-          power_game_context.fillStyle = "blue";
+            color = "yellow";
         } else if (grid[i][j] == 4) {
-          power_game_context.fillStyle = "yellow";
-        } else {
-          power_game_context.fillStyle = "blank";  // Don't draw anything else!
+            color = "blue";
         }
+
+        power_game_context.fillStyle = color;
         
         draw_connection_points(i, j);
       }
