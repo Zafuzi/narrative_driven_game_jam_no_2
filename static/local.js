@@ -147,8 +147,8 @@ function power_game() {
   function update_mouse(e) {
     //mouse_x = (e.clientX || e.pageX);
     //mouse_y = (e.clientY || e.pageY) - 240;
-    mouse_x = (e.clientX || e.pageX) - 700;
-    mouse_y = (e.clientY || e.pageY) - 120;
+    mouse_x = (e.clientX || e.pageX) - power_game_canvas.getBoundingClientRect().left;
+    mouse_y = (e.clientY || e.pageY) - power_game_canvas.getBoundingClientRect().top;
   }
   
   // Retrieves point pos depending on i and j (Indexes)
