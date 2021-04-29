@@ -43,10 +43,9 @@ var messages = [
 		visible: 1,
 		content: `
 			<h3>Station 4</h3>
-			Don’t mind the outage in my station. I tripped on those damn cables carrying my lunch back to my workstation. Noodles everywhere. I’ll ask Stacy to clean it up and I’ll get the pumps online in about 10 minutes.
-			Regards,
-			Dr. Carson
-			Electrical Engineer
+            <p> Don’t mind the outage in my station. I tripped on those damn cables carrying my lunch back to my workstation. Noodles everywhere. I’ll ask Stacy to clean it up and I’ll get the pumps online in about 10 minutes.</p>
+            <p> Regards, </p>
+			<p> Dr. Carson </p>
 		`
 	}
 ]
@@ -63,7 +62,9 @@ function populate_viewer( content ) {
         r8_viewer.update( [c], (e, d, i) => {
           power_game();
         })
+        return;
     }
+    r8_viewer.update( [c] );
   } else {
     r8_viewer.update( c )
   }
