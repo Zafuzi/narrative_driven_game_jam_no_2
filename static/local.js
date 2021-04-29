@@ -53,8 +53,7 @@ var messages = [
 
 function populate_viewer( content ) {
   let c = Object.assign({}, content[0]); 
-  c = [c];
-  if( c[0] && c[0].id == 1 )
+  if( c )
   {
     current_message = c.id;
     if( c.id == 1 ) {
