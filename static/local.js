@@ -416,7 +416,7 @@ function power_game() {
   // 6. Check for connecting point with point at end. [x]
   
   // TODO:
-  // 1. Is there better way to move line by back than using pop?
+  // 1. Cancel game loop if player out of game section?
   // 2. Better way to detect victory?
   var lines = [ [], [], [], [] ];
   
