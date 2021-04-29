@@ -356,9 +356,9 @@ function power_game() {
         } else if (grid[i][j] == 2) {
             color = "green";
         } else if (grid[i][j] == 3) {
-            color = "yellow";
-        } else if (grid[i][j] == 4) {
             color = "blue";
+        } else if (grid[i][j] == 4) {
+            color = "yellow";
         }
 
         power_game_context.fillStyle = color;
