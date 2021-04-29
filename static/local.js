@@ -391,7 +391,7 @@ function power_game() {
               
         } else {
           if (point_obj.i != mouse_i || point_obj.j != mouse_j) {
-          // If not diagonal, Push!
+            // If not diagonal, Push!
             var not_diagonal_1 = (mouse_i - point_obj.i != 0 && mouse_j - point_obj.j == 0);
             var not_diagonal_2 = (mouse_i - point_obj.i == 0 && mouse_j - point_obj.j != 0);
                 
