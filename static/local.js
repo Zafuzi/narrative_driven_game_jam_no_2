@@ -3,7 +3,7 @@ document.addEventListener("DOMContentLoaded", dcl => {
 	init();
 })
 
-const DEV = true;
+const DEV = false;
 
 var keys_down = [];
 
