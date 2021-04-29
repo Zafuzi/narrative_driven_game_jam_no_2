@@ -385,7 +385,7 @@ function power_game() {
     //if (logs++ == 20) console.log(lines[0]);
   }
   
-  power_game_canvas.onmousemove = function(e) { update_mouse(e); };
+  power_game_canvas.onmousemove = update_mouse; 
   
   power_game_canvas.ondblclick = function(e) {
     update_mouse(e);
