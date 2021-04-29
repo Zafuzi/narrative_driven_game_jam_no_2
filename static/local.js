@@ -54,13 +54,16 @@ var messages = [
 
 function populate_viewer( content ) {
   let c = Object.assign({}, content[0]); 
-  c = [c];
-  if( c[0] && c[0].id == 1 )
+  c = c;
+  if( c && c.id )
   {
-    c[0].content = `<canvas id="power_game" width=300 height=300></canvas>` + content[0].content;
-    r8_viewer.update( c, (e, d, i) => {
-      power_game();
-    })
+    current_message = c.id;
+    if( c.id == 1 ) {
+        c.content = `<canvas id="power_game" width=300 height=300></canvas>` + c.content;
+        r8_viewer.update( [c], (e, d, i) => {
+          power_game();
+        })
+    }
   } else {
     r8_viewer.update( c )
   }
