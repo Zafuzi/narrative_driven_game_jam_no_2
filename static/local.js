@@ -137,6 +137,145 @@ function init() {
 	}
 }
 
+document.addEventListener("DOMContentLoaded", dcl => {
+	sleepless.globalize();
+	init();
+})
+
+const DEV = true;
+
+var keys_down = [];
+
+var current_message = 0;
+
+// anything with a visible: 1 will be shown in the messages list in the game
+var messages = [
+	{ 
+		id: 0, 
+		title: "URS-1A - Dr. Treace", 
+		read: 0,
+		visible: 1,
+		content: `
+			<h3>Welcome to URS-1A</h3>
+			<br/>
+			<p>Abigail here! Hope you are settling in well. I know the first night down here can be a bit lonely, so I sent you my favorite song. It's not much company, but it's better than nothing!</p>
+			<br/>
+			<img src="https://media.giphy.com/media/3o7aTkzctUbDfzDJ84/giphy-downsized.gif">
+			<p>See ya around :)</p>
+			<br/>
+			<em>Abigail Treace</em>
+		`
+	},
+	{ 
+		id: 1, 
+		title: "Power Game", 
+		read: 0,
+		visible: 1,
+		content: `
+		<p>Nascetur montes magnis feugiat velit nostra blandit magna eleifend, pharetra fringilla penatibus volutpat nulla mi cubilia, metus tortor a lectus quisque at mus. Suspendisse cum vulputate porta ridiculus venenatis etiam rutrum hac scelerisque platea phasellus posuere, lobortis lacinia curae nullam mauris imperdiet ut dapibus integer lacus. Eu in odio felis feugiat sed tortor viverra dui himenaeos fermentum consequat neque diam montes, mus dignissim blandit ut donec ac condimentum mattis vehicula egestas penatibus sodales varius.</p> <p>Erat per nibh facilisis sociis curae rutrum dui, dictumst mauris sollicitudin iaculis sagittis nullam ornare leo, nascetur luctus purus class pharetra feugiat. Non aliquam tincidunt volutpat per velit, molestie porttitor et habitasse primis, tempor nisl sagittis ante. Hendrerit etiam litora consequat leo torquent congue, mollis cubilia parturient sollicitudin gravida rhoncus suscipit, magna egestas odio fermentum purus.</p>
+		`
+	},
+	{ 
+		id: 2, 
+		title: "Dr. Carson", 
+		read: 0,
+		visible: 1,
+		content: `
+			<h3>Station 4</h3>
+			Don’t mind the outage in my station. I tripped on those damn cables carrying my lunch back to my workstation. Noodles everywhere. I’ll ask Stacy to clean it up and I’ll get the pumps online in about 10 minutes.
+			Regards,
+			Dr. Carson
+			Electrical Engineer
+		`
+	}
+]
+
+
+function populate_viewer( content ) {
+  let c = Object.assign({}, content[0]); 
+  c = [c];
+  if( c[0] && c[0].id == 1 )
+  {
+    c[0].content = `<canvas id="power_game" width=300 height=300></canvas>` + content[0].content;
+    r8_viewer.update( c, (e, d, i) => {
+      power_game();
+    })
+  } else {
+    r8_viewer.update( c )
+  }
+}
+
+
+function start_game() {
+	let main_game = document.querySelector("#main_game");
+	main_game.classList.remove("hid");
+	setTimeout(function() {
+		main_game.classList.add("active");
+	}, 300);
+
+	// build out a list of messages that will be sent to the user
+	// make those messages be sent after a condition is met
+	// this may require proxies? to handle watching data and what not
+	// basically, ask the server what message I should display next like MHR does
+	// so I finish scenario 1, move onto scenario 2. But check that scenario 2 has all conditions met
+
+	// for example you click the welcome message from URS-1A and that finishes scenario 1
+	// but scenario 2 isnt ready until station 4 goes down. Dr. Carson then sends you a message, and that's the start of scenario 2
+
+	let r8_message = rplc8("#message");
+	let a = [];
+	messages.filter(a => a.visible).reverse().forEach(m => {
+		m.class = m.read ? "message_read" : "";
+		a.push(m);
+	})
+	r8_message.update(a, (e, d, i) => {
+		e.addEventListener("click", function(ev) {
+			d.read = true;
+			e.classList.add("message_read");
+			populate_viewer( [d] );
+		});
+	})
+
+}
+
+let r8_viewer;
+function init() {
+	r8_viewer = rplc8("#view_message");
+	populate_viewer([]);
+	let main_menu = document.querySelector("#main_menu");
+	let play_button = document.querySelector("#play_button");
+	
+	play_button.addEventListener("click", function() {
+		main_menu.classList.remove("active");	
+		setTimeout(function() {
+			main_menu.classList.add("hid");	
+			start_game();
+		}, 300);
+	})
+
+	let o = {cmd: "log", msg: "Hello World!" }
+	rpc( o, console.log, console.error );
+
+	document.addEventListener("keydown", (ev) => {
+		if( keys_down.indexOf(ev.key) == -1 ) {
+			keys_down.push( ev.key );
+		}
+	})
+
+	document.addEventListener("keyup", (ev) => {
+		keys_down.splice(keys_down.indexOf(ev.key), 1);
+	})
+
+	if( ! DEV ) {
+		main_menu.classList.remove("hid");	
+		setTimeout(function() {
+			main_menu.classList.add("active");	
+		}, 300);
+	} else {
+		start_game();
+	}
+}
+
 function power_game() {
   // Detects collision between 2 rectangles...
   function AABB(x1, y1, w1, h1, x2, y2, w2, h2) {
@@ -263,6 +402,8 @@ function power_game() {
   var collided_color        = 0;
   var point_color           = -1;
   var colors_connected      = [ false, false, false, false ];
+  var colors_pal1           = [ "blank", "red", "green", "blue", "yellow" ];
+  var colors_pal2           = [ "red", "green", "blue", "yellow", "blank" ];
   var tile_width            = power_game_canvas.width / 5;
   var tile_height           = power_game_canvas.height / 5;
   
@@ -316,17 +457,7 @@ function power_game() {
   
   function draw_connection_lines(lines) {
     for (var i = 0; i < lines.length; i++) {
-      if (i == 0) {
-        power_game_context.strokeStyle = "red";
-      } else if (i == 1) {
-        power_game_context.strokeStyle = "green";
-      } else if (i == 2) {
-        power_game_context.strokeStyle = "blue";
-      } else if (i == 3) {
-        power_game_context.strokeStyle = "yellow";
-      } else {
-        power_game_context.strokeStyle = "blank";  // Don't draw anything else!
-      }
+      power_game_context.strokeStyle = colors_pal2[i];
       
       for (var j = 1; j < lines[i].length; j++) {
         var p1 = point_pos(lines[i][j - 1].i, lines[i][j - 1].j);
@@ -405,18 +536,7 @@ function power_game() {
           }
         }
         
-        if (grid[i][j] == 1) {
-          power_game_context.fillStyle = "red";
-        } else if (grid[i][j] == 2) {
-          power_game_context.fillStyle = "green";
-        } else if (grid[i][j] == 3) {
-          power_game_context.fillStyle = "blue";
-        } else if (grid[i][j] == 4) {
-          power_game_context.fillStyle = "yellow";
-        } else {
-          power_game_context.fillStyle = "blank";  // Don't draw anything else!
-        }
-        
+        power_game_context.fillStyle = colors_pal1[grid[i][j]]; 
         draw_connection_points(i, j);
       }
       draw_connection_lines(lines);
