@@ -147,7 +147,6 @@ function power_game() {
   function update_mouse(e) {
     mouse_x = e.clientX || e.pageX;
     mouse_y = (e.clientY || e.pageY) - 240;
-    console.log(mouse_x, mouse_y);
   }
   
   // Retrieves point pos depending on i and j (Indexes)
