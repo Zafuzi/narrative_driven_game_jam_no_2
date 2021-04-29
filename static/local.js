@@ -285,20 +285,20 @@ function power_game() {
   var lines = [ [], [], [], [] ];
   
   var colors_points = [
-    { start: { i: 0, j: 0 }, end: { i: 4, j: 0 } }, // red
-    { start: { i: 0, j: 2 }, end: { i: 4, j: 1 } }, // green
-    { start: { i: 0, j: 3 }, end: { i: 4, j: 2 } }, // blue
-    { start: { i: 0, j: 4 }, end: { i: 4, j: 4 } }, // yellow
+    { start: { i: 0, j: 2 }, end: { i: 4, j: 1 } }, // red      (1 on grid)
+    { start: { i: 1, j: 1 }, end: { i: 2, j: 2 } }, // green    (2 on grid)
+    { start: { i: 2, j: 1 }, end: { i: 1, j: 3 } }, // blue     (3 on grid)
+    { start: { i: 0, j: 3 }, end: { i: 4, j: 2 } }, // yellow   (4 on grid)
   ];
 
   // 0: none, 1: red, 2: green, 3: blue, 4: yellow
-  // 5x5 rendered
+  // 5x5 rendered  
   var grid = [
-    [ 1, 0, 2, 3, 4 ],
+    [ 0, 0, 1, 4, 0 ],
+    [ 0, 2, 0, 3, 0 ],
+    [ 0, 3, 2, 0, 0 ],
     [ 0, 0, 0, 0, 0 ],
-    [ 0, 0, 0, 0, 0 ],
-    [ 0, 0, 0, 0, 0 ],
-    [ 1, 2, 3, 0, 4 ],
+    [ 0, 1, 4, 0, 0 ],
   ];
   
   function draw_grid(i, j) {
