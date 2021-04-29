@@ -186,7 +186,7 @@ function power_game() {
       var j_con         = (start_j == arr_start_j || start_j == arr_end_j || end_j == arr_start_j || end_j == arr_end_j);
     
       if (i_con && j_con) {
-        colors_connected[c] = true;
+        if (colors_connected[c] != true) colors_connected[c] = true;
       }
     }
   }
@@ -230,7 +230,8 @@ function power_game() {
           for (var z = 0; z < lines[y].length; z++) {
             for (var e = 0; e < lines[c].length; e++) {
               if (matches_in_array(lines[c][e], lines[y]) > 1) {
-                cut_connection(c, y);
+                cut_connection(y);
+                //cut_connection(c, y);
               }
             }
           }
@@ -270,6 +271,7 @@ function power_game() {
   var colors_pal2           = [ "red", "green", "blue", "yellow", "blank" ];
   var tile_width            = power_game_canvas.width / 5;
   var tile_height           = power_game_canvas.height / 5;
+  var loop_handler          = 0;
   
   // Handling connection idea (Rabia):
   // 1. Player clicks on point. [x] 
@@ -279,9 +281,7 @@ function power_game() {
   // 5. Else, Push info and draw line with rounded corner from first pos to second pos and so on. [x]
   // 6. Check for connecting point with point at end. [x]
   
-  // TODO:
-  // 1. Cancel game loop if player out of game section?
-  // 2. Better way to detect victory?
+  // TODO: Better way to detect victory?
   var lines = [ [], [], [], [] ];
   
   var colors_points = [
@@ -340,74 +340,74 @@ function power_game() {
     }
   }
 
-  function render() {
+  function update() {
     power_game_context.clearRect(0, 0, power_game_canvas.width, power_game_canvas.height);
     
     // Render grid
     for (var i = 0; i < grid.length; i++) {
       for (var j = 0; j < grid[i].length; j++) {
         draw_grid(i, j);
-        
-        // Assign i and j to mouse
-        if (AABB(mouse_x, mouse_y, 1, 1, (j * tile_width), (i * tile_height), tile_width, tile_height)) {
-          mouse_i = i;
-          mouse_j = j;
-          power_game_context.strokeStyle = "cyan";
-          power_game_context.strokeRect((j * tile_width), (i * tile_height), tile_width, tile_height);
-          
-          // Add point to list of points of same color
-          if (point_selected && point_color >= 0) {
-            var point_obj = (lines[point_color].length > 1) ? lines[point_color][lines[point_color].length - 1] : lines[point_color][0];
-              
-            if (!point_obj) {
-              if (selected_from_start) {
-                point_obj = colors_points[point_color].start;
-              } else {
-                point_obj = colors_points[point_color].end;
-              }
-                
-              lines[point_color].push({ i : point_obj.i, j: point_obj.j });
-            }
-              
-            if (grid[mouse_i][mouse_j] == 0 || grid[mouse_i][mouse_j] - 1 == point_color) {
-              if (point_obj.i != mouse_i || point_obj.j != mouse_j) {
-                // If not diagonal, Push!
-                var not_diagonal_1 = (mouse_i - point_obj.i != 0 && mouse_j - point_obj.j == 0);
-                var not_diagonal_2 = (mouse_i - point_obj.i == 0 && mouse_j - point_obj.j != 0);
-                
-                if (not_diagonal_1 || not_diagonal_2) lines[point_color].push({ i : mouse_i, j: mouse_j });
-              
-              } else {
-                lines[point_color].pop();
-              }
-              
-            } else {
-              if (point_obj.i != mouse_i || point_obj.j != mouse_j) {
-                // If not diagonal, Push!
-                var not_diagonal_1 = (mouse_i - point_obj.i != 0 && mouse_j - point_obj.j == 0);
-                var not_diagonal_2 = (mouse_i - point_obj.i == 0 && mouse_j - point_obj.j != 0);
-                
-                if (not_diagonal_1 || not_diagonal_2) lines[point_color].push({ i : mouse_i, j: mouse_j });
-              
-              } else {
-                lines[point_color].pop();
-              }
-              
-              lines[collided_color] = [];
-              lines[point_color] = [];
-              point_selected = false;
-            }
-          }
-        }
-        
         power_game_context.fillStyle = colors_pal1[grid[i][j]]; 
         draw_connection_points(i, j);
+        update_mouse_input(i, j);
       }
       draw_connection_lines(lines);
     }
   }
   
-  function update() {
+  function update_mouse_input(i, j) {
+    // Assign i and j to mouse
+    if (AABB(mouse_x, mouse_y, 1, 1, (j * tile_width), (i * tile_height), tile_width, tile_height)) {
+      mouse_i = i;
+      mouse_j = j;
+      power_game_context.strokeStyle = "cyan";
+      power_game_context.strokeRect((j * tile_width), (i * tile_height), tile_width, tile_height);
+          
+      // Add point to list of points of same color
+      if (point_selected && point_color >= 0) {
+        var point_obj = (lines[point_color].length > 1) ? lines[point_color][lines[point_color].length - 1] : lines[point_color][0];
+              
+        if (!point_obj) {
+          if (selected_from_start) {
+            point_obj = colors_points[point_color].start;
+          } else {
+            point_obj = colors_points[point_color].end;
+          }
+                
+          lines[point_color].push({ i : point_obj.i, j: point_obj.j });
+        }
+              
+        if (grid[mouse_i][mouse_j] == 0 || grid[mouse_i][mouse_j] - 1 == point_color) {
+          if (point_obj.i != mouse_i || point_obj.j != mouse_j) {
+            // If not diagonal, Push!
+            var not_diagonal_1 = (mouse_i - point_obj.i != 0 && mouse_j - point_obj.j == 0);
+            var not_diagonal_2 = (mouse_i - point_obj.i == 0 && mouse_j - point_obj.j != 0);
+                
+            if (not_diagonal_1 || not_diagonal_2) lines[point_color].push({ i : mouse_i, j: mouse_j });
+            
+          } else {
+            lines[point_color].pop();
+          }
+              
+        } else {
+          if (point_obj.i != mouse_i || point_obj.j != mouse_j) {
+          // If not diagonal, Push!
+            var not_diagonal_1 = (mouse_i - point_obj.i != 0 && mouse_j - point_obj.j == 0);
+            var not_diagonal_2 = (mouse_i - point_obj.i == 0 && mouse_j - point_obj.j != 0);
+                
+            if (not_diagonal_1 || not_diagonal_2) lines[point_color].push({ i : mouse_i, j: mouse_j });
+              
+          } else {
+            lines[point_color].pop();
+          }
+              
+          lines[collided_color] = [];
+          lines[point_color] = [];
+          point_selected = false;
+        }
+      }
+    }
+        
     var matches = 0;
     
     for (var x = 0; x < colors_connected.length; x++) {
@@ -423,11 +423,10 @@ function power_game() {
   }
   
   function loop() {
-    render();
-    update();
-    window.requestAnimationFrame(loop);
-    
-    //if (logs++ == 20) console.log(lines[0]);
+    if (current_message == 1) {
+      update();
+      window.requestAnimationFrame(loop);
+    }
   }
   
   power_game_canvas.onmousemove = function(e) { update_mouse(e); };
