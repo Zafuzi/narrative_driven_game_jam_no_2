@@ -132,7 +132,8 @@ function start_game() {
     render_messages();
   }, interval);
 
-  show_message(1, 10);
+  show_message(3, 0);
+  show_message(1, 0);
   show_message(0);
 }
 
@@ -153,7 +154,7 @@ function show_message(id, timeout) {
 let r8_viewer;
 function init() {
 	r8_viewer = rplc8("#view_message");
-	populate_viewer([]);
+	populate_viewer([{title:"", content:""}]);
 	let main_menu = document.querySelector("#main_menu");
 	let play_button = document.querySelector("#play_button");
 	
