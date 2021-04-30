@@ -112,10 +112,16 @@ function start_game() {
     render_messages();
   }, 2000);
 
+  show_message(1, 10);
+  show_message(0);
+}
+
+function show_message(id, timeout) {
   setTimeout(function() {
-    messages[0].visible = 1;
+    if( ! messages[id] ) return;
+    messages[id].visible = 1;
     messages_need_update = true;
-  }, 1000);
+  }, timeout || 1000);
 }
 
 let r8_viewer;
