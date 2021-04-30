@@ -15,7 +15,7 @@ const messages = [
         id: 0,
         title: "URS-1A - Dr. Treace",
         read: 0,
-        visible: 1,
+        visible: 0,
         content: `
             <h3>Welcome to URS-1A!</h3>
             <br/>
@@ -31,7 +31,7 @@ const messages = [
         id: 1,
         title: "URS - AUTOMATED MONITORING",
         read: 0,
-        visible: 1,
+        visible: 0,
         content: `
           <h3>Anomaly detected at Station 4</h3>
           <p>Nascetur montes magnis feugiat velit nostra blandit magna eleifend, pharetra fringilla penatibus volutpat nulla mi cubilia, metus tortor a lectus quisque at mus. Suspendisse cum vulputate porta ridiculus venenatis etiam rutrum hac scelerisque platea phasellus posuere, lobortis lacinia curae nullam mauris imperdiet ut dapibus integer lacus. Eu in odio felis feugiat sed tortor viverra dui himenaeos fermentum consequat neque diam montes, mus dignissim blandit ut donec ac condimentum mattis vehicula egestas penatibus sodales varius.</p> <p>Erat per nibh facilisis sociis curae rutrum dui, dictumst mauris sollicitudin iaculis sagittis nullam ornare leo, nascetur luctus purus class pharetra feugiat. Non aliquam tincidunt volutpat per velit, molestie porttitor et habitasse primis, tempor nisl sagittis ante. Hendrerit etiam litora consequat leo torquent congue, mollis cubilia parturient sollicitudin gravida rhoncus suscipit, magna egestas odio fermentum purus.</p>
@@ -70,6 +70,35 @@ function populate_viewer( content ) {
   }
 }
 
+let r8_message; // message template
+var messages_need_update = false;
+function render_messages() {
+  if( ! r8_message )
+    r8_message = rplc8("#message");
+
+  // only update if there are changes
+  if( messages_need_update ) {
+    messages_need_update = false;
+    let a = [];
+    messages.filter(a => a.visible).reverse().forEach(m => {
+      m.class = m.read ? "message_read" : "";
+      m.trim_content = m.content.split("\n")[1];
+      if( m.trim_content ) {
+        console.log(m.trim_content)
+        m.trim_content = m.trim_content.slice(0, 120);
+      }
+      a.push(m);
+    })
+    r8_message.update(a, (e, d, i) => {
+      e.addEventListener("click", function(ev) {
+        d.read = true;
+        e.classList.add("message_read");
+        populate_viewer( [d] );
+      });
+    })
+  }
+}
+
 
 function start_game() {
 	let main_game = document.querySelector("#main_game");
@@ -78,35 +107,15 @@ function start_game() {
 		main_game.classList.add("active");
 	}, 300);
 
-	// build out a list of messages that will be sent to the user
-	// make those messages be sent after a condition is met
-	// this may require proxies? to handle watching data and what not
-	// basically, ask the server what message I should display next like MHR does
-	// so I finish scenario 1, move onto scenario 2. But check that scenario 2 has all conditions met
+  render_messages();
+  setInterval(function() {
+    render_messages();
+  }, 2000);
 
-	// for example you click the welcome message from URS-1A and that finishes scenario 1
-	// but scenario 2 isnt ready until station 4 goes down. Dr. Carson then sends you a message, and that's the start of scenario 2
-
-	let r8_message = rplc8("#message");
-	let a = [];
-	messages.filter(a => a.visible).reverse().forEach(m => {
-		m.class = m.read ? "message_read" : "";
-    m.trim_content = m.content.split("\n")[1];
-    console.log(m.trim_content)
-    if( m.trim_content ) {
-      console.log(m.trim_content)
-      m.trim_content = m.trim_content.slice(0, 120);
-    }
-		a.push(m);
-	})
-	r8_message.update(a, (e, d, i) => {
-		e.addEventListener("click", function(ev) {
-			d.read = true;
-			e.classList.add("message_read");
-			populate_viewer( [d] );
-		});
-	})
-
+  setTimeout(function() {
+    messages[0].visible = 1;
+    messages_need_update = true;
+  }, 1000);
 }
 
 let r8_viewer;
