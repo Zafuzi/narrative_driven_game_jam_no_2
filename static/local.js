@@ -278,7 +278,6 @@ function power_game() {
   var mouse_y               = 0;
   var mouse_i               = 0;
   var mouse_j               = 0;
-  var logs                  = 0;
   var point_selected        = false;
   var is_mouse_down         = false;
   var selected_from_start   = false;
@@ -291,7 +290,6 @@ function power_game() {
   var colors_pal2           = [ "red", "green", "blue", "yellow", "blank" ];
   var tile_width            = power_game_canvas.width / 5;
   var tile_height           = power_game_canvas.height / 5;
-  var loop_handler          = 0;
   
   // Handling connection idea (Rabia):
   // 1. Player clicks on point. [x] 
@@ -301,9 +299,6 @@ function power_game() {
   // 5. Else, Push info and draw line with rounded corner from first pos to second pos and so on. [x]
   // 6. Check for connecting point with point at end. [x]
   
-  // TODO:
-  // 1. When player connects 2 points of same color, At same time selected piece is deselected!
-  // 2. Better way to detect victory?
   var lines = [ [], [], [], [] ];
   
   var colors_points = [
@@ -322,6 +317,33 @@ function power_game() {
     [ 0, 0, 0, 0, 0 ],
     [ 0, 1, 4, 0, 0 ],
   ];
+  
+  function reset_game() {
+    point_selected = false;
+    is_mouse_down = false;
+    selected_from_start = false;
+    selected_from_end = false;
+    player_win_alerts = 0;        // Just stops at 1 so just alerts once when player wins!
+    collided_color = 0;
+    point_color = -1;
+    
+    grid = [
+      [ 0, 0, 1, 4, 0 ],
+      [ 0, 2, 0, 3, 0 ],
+      [ 0, 3, 2, 0, 0 ],
+      [ 0, 0, 0, 0, 0 ],
+      [ 0, 1, 4, 0, 0 ],
+    ];
+    
+    lines = [ [], [], [], [] ];
+  
+    colors_points = [
+      { start: { i: 0, j: 2 }, end: { i: 4, j: 1 }, connected_from_start: false, connected_from_end: false }, // red      (1 on grid)
+      { start: { i: 1, j: 1 }, end: { i: 2, j: 2 }, connected_from_start: false, connected_from_end: false }, // green    (2 on grid)
+      { start: { i: 2, j: 1 }, end: { i: 1, j: 3 }, connected_from_start: false, connected_from_end: false }, // blue     (3 on grid)
+      { start: { i: 0, j: 3 }, end: { i: 4, j: 2 }, connected_from_start: false, connected_from_end: false }, // yellow   (4 on grid)
+    ];
+  }
   
   function draw_grid(i, j) {
     power_game_context.strokeStyle = "gray";
@@ -486,6 +508,12 @@ function power_game() {
       }
     }
   }
+  
+  document.addEventListener("keydown", function(e) {
+    if (e.which == 82) {
+      reset_game();
+    }
+  });
   
   power_game_canvas.onmouseup = function(e) {
     update_mouse(e);
