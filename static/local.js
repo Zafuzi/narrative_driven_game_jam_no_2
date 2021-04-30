@@ -591,12 +591,12 @@ function bar_game() {
   var bar_game_context  = bar_game_canvas.getContext("2d");
   bar_game_context.fillStyle = "green";
   
-  var meter_percent     = 10;
+  var meter_percent     = 70;
   var speed             = 1;
   var player_win_alerts = 0;
   
   function reset_game() {
-    meter_percent = 10;
+    meter_percent = 70;
   }
   
   function render() {
