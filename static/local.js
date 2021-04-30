@@ -124,14 +124,30 @@ function start_game() {
 	}, 300);
 
   render_messages();
+  let interval = 2000;
+  if( DEV ) {
+    interval = 100;
+  }
   setInterval(function() {
     render_messages();
-  }, 2000);
+  }, interval);
 
-  setTimeout(function() {
-    messages[0].visible = 1;
-    messages_need_update = true;
-  }, 1000);
+  show_message(1, 10);
+  show_message(0);
+}
+
+function show_message(id, timeout) {
+  if(DEV) {
+      if( ! messages[id] ) return;
+      messages[id].visible = 1;
+      messages_need_update = true;
+  } else {
+    setTimeout(function() {
+      if( ! messages[id] ) return;
+      messages[id].visible = 1;
+      messages_need_update = true;
+    }, timeout || 1000);
+  }
 }
 
 let r8_viewer;
@@ -202,44 +218,54 @@ function power_game() {
     return res;
   }
   
- 
-  function check_connection(c) {
-    if (lines[c].length > 1) {
-      var start_i       = colors_points[c].start.i;
-      var end_i         = colors_points[c].end.i;
-      var start_j       = colors_points[c].start.i;
-      var end_j         = colors_points[c].end.i;
-      var arr_start_i   = lines[c][0].i;
-      var arr_end_i     = lines[c][lines[c].length - 1].i;
-      var arr_start_j   = lines[c][0].j;
-      var arr_end_j     = lines[c][lines[c].length - 1].j;
+  function get_connections() {
+    var res = 0;
     
-      var i_con         = (start_i == arr_start_i || start_i == arr_end_i || end_i == arr_start_i || end_i == arr_end_i);
-      var j_con         = (start_j == arr_start_j || start_j == arr_end_j || end_j == arr_start_j || end_j == arr_end_j);
-    
-      if (i_con && j_con) {
-        if (colors_connected[c] != true) colors_connected[c] = true;
+    for (var o = 0; o < lines.length; o++) {
+      if (lines[o].length > 0) {
+        if (colors_points[o].selected_from_start) {
+          if ((lines[o][0].i == colors_points[o].start.i) && (lines[o][0].j == colors_points[o].start.j) && (lines[o][lines[o].length - 1].i == colors_points[o].end.i) && (lines[o][lines[o].length - 1].j == colors_points[o].end.j)) {
+            res++;
+          }
+        } else if (colors_points[o].selected_from_end) {
+          if ((lines[o][0].i == colors_points[o].end.i) && (lines[o][0].j == colors_points[o].end.j) && (lines[o][lines[o].length - 1].i == colors_points[o].start.i) && (lines[o][lines[o].length - 1].j == colors_points[o].start.j)) {
+            res++;
+          }
+        }
       }
     }
+    
+    return res;
   }
   
   function cut_connection(c, d) {
-    selected_from_start     = false;
-    selected_from_end       = false;
-    lines[c]                = [];
-    if (d) lines[d]         = [];
-    point_selected          = false;
-    point_color             = -1;
+    selected_from_start                     = false;
+    selected_from_end                       = false;
+    
+    if (c) {
+      lines[c]                              = [];
+      colors_points[c].selected_from_start  = false;
+      colors_points[c].selected_from_end    = false;
+    }
+    
+    if (d) {
+      lines[d]                              = [];
+      colors_points[d].selected_from_start  = false;
+      colors_points[d].selected_from_end    = false;
+    }
+    
+    point_selected                          = false;
+    point_color                             = -1;
   }
   
   function matches_in_array(e, a) {
-    var matches = 0;
+    var res = 0;
     
     for (var o = 0; o < a.length; o++) {
-      if (a[o].i == e.i && a[o].j == e.j) matches++;
+      if (a[o].i == e.i && a[o].j == e.j) res++;
     }
     
-    return matches;
+    return res;
   }
   
   function check_lines_collision(c) {
@@ -272,38 +298,24 @@ function power_game() {
     }
   }
   
-  /*
-  function check_victory() {
-    var matches = 0;
-    
-    for (var x = 0; x < colors_connected.length; x++) {
-      if (check_connection(x)) matches++;
-      console.log("color " + x + " connected: " + colors_connected[x]);
-    }
-    
-    console.log(matches);
-    if (matches == colors_connected.length) alert("YOU WON!");
-  }
-  */
-  
   var power_game_canvas     = document.getElementById("power_game");
   var power_game_context    = power_game_canvas.getContext("2d");
   var mouse_x               = 0;
   var mouse_y               = 0;
   var mouse_i               = 0;
   var mouse_j               = 0;
-  var logs                  = 0;
   var point_selected        = false;
+  var is_mouse_down         = false;
   var selected_from_start   = false;
   var selected_from_end     = false;
+  var player_win_alerts     = 0;        // Just stops at 1 so just alerts once when player wins!
   var collided_color        = 0;
   var point_color           = -1;
-  var colors_connected      = [ false, false, false, false ];
+  var colors_count          = 4;
   var colors_pal1           = [ "blank", "red", "green", "blue", "yellow" ];
   var colors_pal2           = [ "red", "green", "blue", "yellow", "blank" ];
   var tile_width            = power_game_canvas.width / 5;
   var tile_height           = power_game_canvas.height / 5;
-  var loop_handler          = 0;
   
   // Handling connection idea (Rabia):
   // 1. Player clicks on point. [x] 
@@ -313,25 +325,51 @@ function power_game() {
   // 5. Else, Push info and draw line with rounded corner from first pos to second pos and so on. [x]
   // 6. Check for connecting point with point at end. [x]
   
-  // TODO: Better way to detect victory?
   var lines = [ [], [], [], [] ];
   
   var colors_points = [
-    { start: { i: 0, j: 0 }, end: { i: 4, j: 0 } }, // red
-    { start: { i: 0, j: 2 }, end: { i: 4, j: 1 } }, // green
-    { start: { i: 0, j: 3 }, end: { i: 4, j: 2 } }, // blue
-    { start: { i: 0, j: 4 }, end: { i: 4, j: 4 } }, // yellow
+    { start: { i: 0, j: 2 }, end: { i: 4, j: 1 }, connected_from_start: false, connected_from_end: false }, // red      (1 on grid)
+    { start: { i: 1, j: 1 }, end: { i: 2, j: 2 }, connected_from_start: false, connected_from_end: false }, // green    (2 on grid)
+    { start: { i: 2, j: 1 }, end: { i: 1, j: 3 }, connected_from_start: false, connected_from_end: false }, // blue     (3 on grid)
+    { start: { i: 0, j: 3 }, end: { i: 4, j: 2 }, connected_from_start: false, connected_from_end: false }, // yellow   (4 on grid)
   ];
 
   // 0: none, 1: red, 2: green, 3: blue, 4: yellow
-  // 5x5 rendered
+  // 5x5 rendered  
   var grid = [
-    [ 1, 0, 2, 3, 4 ],
+    [ 0, 0, 1, 4, 0 ],
+    [ 0, 2, 0, 3, 0 ],
+    [ 0, 3, 2, 0, 0 ],
     [ 0, 0, 0, 0, 0 ],
-    [ 0, 0, 0, 0, 0 ],
-    [ 0, 0, 0, 0, 0 ],
-    [ 1, 2, 3, 0, 4 ],
+    [ 0, 1, 4, 0, 0 ],
   ];
+  
+  function reset_game() {
+    point_selected = false;
+    is_mouse_down = false;
+    selected_from_start = false;
+    selected_from_end = false;
+    player_win_alerts = 0;        // Just stops at 1 so just alerts once when player wins!
+    collided_color = 0;
+    point_color = -1;
+    
+    grid = [
+      [ 0, 0, 1, 4, 0 ],
+      [ 0, 2, 0, 3, 0 ],
+      [ 0, 3, 2, 0, 0 ],
+      [ 0, 0, 0, 0, 0 ],
+      [ 0, 1, 4, 0, 0 ],
+    ];
+    
+    lines = [ [], [], [], [] ];
+  
+    colors_points = [
+      { start: { i: 0, j: 2 }, end: { i: 4, j: 1 }, connected_from_start: false, connected_from_end: false }, // red      (1 on grid)
+      { start: { i: 1, j: 1 }, end: { i: 2, j: 2 }, connected_from_start: false, connected_from_end: false }, // green    (2 on grid)
+      { start: { i: 2, j: 1 }, end: { i: 1, j: 3 }, connected_from_start: false, connected_from_end: false }, // blue     (3 on grid)
+      { start: { i: 0, j: 3 }, end: { i: 4, j: 2 }, connected_from_start: false, connected_from_end: false }, // yellow   (4 on grid)
+    ];
+  }
   
   function draw_grid(i, j) {
     power_game_context.strokeStyle = "gray";
@@ -396,7 +434,7 @@ function power_game() {
       power_game_context.strokeRect((j * tile_width), (i * tile_height), tile_width, tile_height);
           
       // Add point to list of points of same color
-      if (point_selected && point_color >= 0) {
+      if (point_selected && is_mouse_down && point_color >= 0) {
         var point_obj = (lines[point_color].length > 1) ? lines[point_color][lines[point_color].length - 1] : lines[point_color][0];
               
         if (!point_obj) {
@@ -414,8 +452,19 @@ function power_game() {
             // If not diagonal, Push!
             var not_diagonal_1 = (mouse_i - point_obj.i != 0 && mouse_j - point_obj.j == 0);
             var not_diagonal_2 = (mouse_i - point_obj.i == 0 && mouse_j - point_obj.j != 0);
-                
+            
             if (not_diagonal_1 || not_diagonal_2) lines[point_color].push({ i : mouse_i, j: mouse_j });
+            
+            // If connected to end, Stop selected piece!
+            if (selected_from_start) {
+              if ((lines[point_color][lines[point_color].length - 1].i == colors_points[point_color].end.i) && (lines[point_color][lines[point_color].length - 1].j == colors_points[point_color].end.j)) {
+                cut_connection();
+              }
+            } else if (selected_from_end) {
+              if ((lines[point_color][lines[point_color].length - 1].i == colors_points[point_color].start.i) && (lines[point_color][lines[point_color].length - 1].j == colors_points[point_color].start.j)) {
+                cut_connection();
+              }
+            }
             
           } else {
             lines[point_color].pop();
@@ -423,35 +472,39 @@ function power_game() {
               
         } else {
           if (point_obj.i != mouse_i || point_obj.j != mouse_j) {
-          // If not diagonal, Push!
+            // If not diagonal, Push!
             var not_diagonal_1 = (mouse_i - point_obj.i != 0 && mouse_j - point_obj.j == 0);
             var not_diagonal_2 = (mouse_i - point_obj.i == 0 && mouse_j - point_obj.j != 0);
                 
             if (not_diagonal_1 || not_diagonal_2) lines[point_color].push({ i : mouse_i, j: mouse_j });
-              
+            
+            // If connected to end, Stop selected piece!
+            if (selected_from_start) {
+              if ((lines[point_color][lines[point_color].length - 1].i == colors_points[point_color].end.i) && (lines[point_color][lines[point_color].length - 1].j == colors_points[point_color].end.j)) {
+                cut_connection();
+              }
+            } else if (selected_from_end) {
+              if ((lines[point_color][lines[point_color].length - 1].i == colors_points[point_color].start.i) && (lines[point_color][lines[point_color].length - 1].j == colors_points[point_color].start.j)) {
+                cut_connection();
+              }
+            }
+            
           } else {
             lines[point_color].pop();
           }
               
           lines[collided_color] = [];
-          lines[point_color] = [];
+          lines[point_color]    = [];
           point_selected = false;
         }
       }
     }
-        
-    var matches = 0;
     
-    for (var x = 0; x < colors_connected.length; x++) {
-      if (check_connection(x)) matches++;
-      
-      // console log is very very slow operation when done lot and lots of times
-      // console.log("color " + x + " connected: " + colors_connected[x]);
+    var matches = get_connections();
+    
+    if (matches == colors_count) {
+      if (player_win_alerts++ == 1) showAlert("okay", "You win!"); // Alert won't be shown multiple times!
     }
-    
-    // console.log(matches);
-    if (point_color != -1) check_lines_collision(point_color);
-    if (matches == colors_connected.length) showAlert("okay", "You win!");
   }
   
   function loop() {
@@ -482,8 +535,20 @@ function power_game() {
     }
   }
   
+  document.addEventListener("keydown", function(e) {
+    if (e.key == "r") {
+      reset_game();
+    }
+  });
+  
+  power_game_canvas.onmouseup = function(e) {
+    update_mouse(e);
+    is_mouse_down = false;
+  };
+  
   power_game_canvas.onmousedown = function(e) {
     update_mouse(e);
+    is_mouse_down = true;
     
     for (var i = 0; i < colors_points.length; i++) {
       var p1 = point_pos(colors_points[i].start.i, colors_points[i].start.j);
@@ -497,11 +562,15 @@ function power_game() {
       
       if (aabb_first_point || aabb_second_point) {
         if (aabb_first_point) {
-          selected_from_start   = true;
-          selected_from_end     = false;
+          selected_from_start                   = true;
+          selected_from_end                     = false;
+          colors_points[i].selected_from_start  = true;
+          colors_points[i].selected_from_end    = false;
         } else {
-          selected_from_start   = false;
-          selected_from_end     = true;
+          selected_from_start                   = false;
+          selected_from_end                     = true;
+          colors_points[i].selected_from_start  = false;
+          colors_points[i].selected_from_end    = true;
         }
         
         point_selected = !point_selected;
