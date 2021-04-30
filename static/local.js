@@ -170,44 +170,23 @@ function power_game() {
     return res;
   }
   
- 
-  function check_connection(c) {
-    if (lines[c].length > 1) {
-      var start_i       = colors_points[c].start.i;
-      var end_i         = colors_points[c].end.i;
-      var start_j       = colors_points[c].start.i;
-      var end_j         = colors_points[c].end.i;
-      var arr_start_i   = lines[c][0].i;
-      var arr_end_i     = lines[c][lines[c].length - 1].i;
-      var arr_start_j   = lines[c][0].j;
-      var arr_end_j     = lines[c][lines[c].length - 1].j;
-    
-      var i_con         = (start_i == arr_start_i || start_i == arr_end_i || end_i == arr_start_i || end_i == arr_end_i);
-      var j_con         = (start_j == arr_start_j || start_j == arr_end_j || end_j == arr_start_j || end_j == arr_end_j);
-    
-      if (i_con && j_con) {
-        if (colors_connected[c] != true) colors_connected[c] = true;
-      }
-    }
-  }
-  
   function cut_connection(c, d) {
     selected_from_start     = false;
     selected_from_end       = false;
-    lines[c]                = [];
+    if (c) lines[c]         = [];
     if (d) lines[d]         = [];
     point_selected          = false;
     point_color             = -1;
   }
   
   function matches_in_array(e, a) {
-    var matches = 0;
+    var res = 0;
     
     for (var o = 0; o < a.length; o++) {
-      if (a[o].i == e.i && a[o].j == e.j) matches++;
+      if (a[o].i == e.i && a[o].j == e.j) res++;
     }
     
-    return matches;
+    return res;
   }
   
   function check_lines_collision(c) {
@@ -240,20 +219,6 @@ function power_game() {
     }
   }
   
-  /*
-  function check_victory() {
-    var matches = 0;
-    
-    for (var x = 0; x < colors_connected.length; x++) {
-      if (check_connection(x)) matches++;
-      console.log("color " + x + " connected: " + colors_connected[x]);
-    }
-    
-    console.log(matches);
-    if (matches == colors_connected.length) alert("YOU WON!");
-  }
-  */
-  
   var power_game_canvas     = document.getElementById("power_game");
   var power_game_context    = power_game_canvas.getContext("2d");
   var mouse_x               = 0;
@@ -267,6 +232,7 @@ function power_game() {
   var collided_color        = 0;
   var point_color           = -1;
   var colors_connected      = [ false, false, false, false ];
+  var matches               = 0;
   var colors_pal1           = [ "blank", "red", "green", "blue", "yellow" ];
   var colors_pal2           = [ "red", "green", "blue", "yellow", "blank" ];
   var tile_width            = power_game_canvas.width / 5;
@@ -281,7 +247,9 @@ function power_game() {
   // 5. Else, Push info and draw line with rounded corner from first pos to second pos and so on. [x]
   // 6. Check for connecting point with point at end. [x]
   
-  // TODO: Better way to detect victory?
+  // TODO:
+  // 1. When player connects 2 points of same color, At same time selected piece is deselected!
+  // 2. Better way to detect victory?
   var lines = [ [], [], [], [] ];
   
   var colors_points = [
@@ -382,8 +350,21 @@ function power_game() {
             // If not diagonal, Push!
             var not_diagonal_1 = (mouse_i - point_obj.i != 0 && mouse_j - point_obj.j == 0);
             var not_diagonal_2 = (mouse_i - point_obj.i == 0 && mouse_j - point_obj.j != 0);
-                
+            
             if (not_diagonal_1 || not_diagonal_2) lines[point_color].push({ i : mouse_i, j: mouse_j });
+            
+            // If connected to end, Stop selecting piece!
+            if (selected_from_start) {
+              if ((lines[point_color][lines[point_color].length - 1].i == colors_points[point_color].end.i) && (lines[point_color][lines[point_color].length - 1].j == colors_points[point_color].end.j)) {
+                cut_connection();
+                matches++;
+              }
+            } else if (selected_from_end) {
+              if ((lines[point_color][lines[point_color].length - 1].i == colors_points[point_color].start.i) && (lines[point_color][lines[point_color].length - 1].j == colors_points[point_color].start.j)) {
+                cut_connection();
+                matches++;
+              }
+            }
             
           } else {
             lines[point_color].pop();
@@ -396,7 +377,20 @@ function power_game() {
             var not_diagonal_2 = (mouse_i - point_obj.i == 0 && mouse_j - point_obj.j != 0);
                 
             if (not_diagonal_1 || not_diagonal_2) lines[point_color].push({ i : mouse_i, j: mouse_j });
-              
+            
+            // If connected to end, Stop selecting piece!
+            if (selected_from_start) {
+              if ((lines[point_color][lines[point_color].length - 1].i == colors_points[point_color].end.i) && (lines[point_color][lines[point_color].length - 1].j == colors_points[point_color].end.j)) {
+                cut_connection();
+                matches++;
+              }
+            } else if (selected_from_end) {
+              if ((lines[point_color][lines[point_color].length - 1].i == colors_points[point_color].start.i) && (lines[point_color][lines[point_color].length - 1].j == colors_points[point_color].start.j)) {
+                cut_connection();
+                matches++;
+              }
+            }
+            
           } else {
             lines[point_color].pop();
           }
@@ -407,18 +401,7 @@ function power_game() {
         }
       }
     }
-        
-    var matches = 0;
     
-    for (var x = 0; x < colors_connected.length; x++) {
-      if (check_connection(x)) matches++;
-      
-      // console log is very very slow operation when done lot and lots of times
-      // console.log("color " + x + " connected: " + colors_connected[x]);
-    }
-    
-    // console.log(matches);
-    if (point_color != -1) check_lines_collision(point_color);
     if (matches == colors_connected.length) showAlert("okay", "You win!");
   }
   
