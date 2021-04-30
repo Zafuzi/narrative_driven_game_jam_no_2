@@ -192,13 +192,44 @@ function power_game() {
     return res;
   }
   
+  function get_connections() {
+    var res = 0;
+    
+    for (var o = 0; o < lines.length; o++) {
+      if (lines[o].length > 0) {
+        if (colors_points[o].selected_from_start) {
+          if ((lines[o][0].i == colors_points[o].start.i) && (lines[o][0].j == colors_points[o].start.j) && (lines[o][lines[o].length - 1].i == colors_points[o].end.i) && (lines[o][lines[o].length - 1].j == colors_points[o].end.j)) {
+            res++;
+          }
+        } else if (colors_points[o].selected_from_end) {
+          if ((lines[o][0].i == colors_points[o].end.i) && (lines[o][0].j == colors_points[o].end.j) && (lines[o][lines[o].length - 1].i == colors_points[o].start.i) && (lines[o][lines[o].length - 1].j == colors_points[o].start.j)) {
+            res++;
+          }
+        }
+      }
+    }
+    
+    return res;
+  }
+  
   function cut_connection(c, d) {
-    selected_from_start     = false;
-    selected_from_end       = false;
-    if (c) lines[c]         = [];
-    if (d) lines[d]         = [];
-    point_selected          = false;
-    point_color             = -1;
+    selected_from_start                     = false;
+    selected_from_end                       = false;
+    
+    if (c) {
+      lines[c]                              = [];
+      colors_points[c].selected_from_start  = false;
+      colors_points[c].selected_from_end    = false;
+    }
+    
+    if (d) {
+      lines[d]                              = [];
+      colors_points[d].selected_from_start  = false;
+      colors_points[d].selected_from_end    = false;
+    }
+    
+    point_selected                          = false;
+    point_color                             = -1;
   }
   
   function matches_in_array(e, a) {
@@ -251,10 +282,10 @@ function power_game() {
   var point_selected        = false;
   var selected_from_start   = false;
   var selected_from_end     = false;
+  var player_win_alerts     = 0;        // Just stops at 1 so just alerts once when player wins!
   var collided_color        = 0;
   var point_color           = -1;
-  var colors_connected      = [ false, false, false, false ];
-  var matches               = 0;
+  var colors_count          = 4;
   var colors_pal1           = [ "blank", "red", "green", "blue", "yellow" ];
   var colors_pal2           = [ "red", "green", "blue", "yellow", "blank" ];
   var tile_width            = power_game_canvas.width / 5;
@@ -275,10 +306,10 @@ function power_game() {
   var lines = [ [], [], [], [] ];
   
   var colors_points = [
-    { start: { i: 0, j: 2 }, end: { i: 4, j: 1 } }, // red      (1 on grid)
-    { start: { i: 1, j: 1 }, end: { i: 2, j: 2 } }, // green    (2 on grid)
-    { start: { i: 2, j: 1 }, end: { i: 1, j: 3 } }, // blue     (3 on grid)
-    { start: { i: 0, j: 3 }, end: { i: 4, j: 2 } }, // yellow   (4 on grid)
+    { start: { i: 0, j: 2 }, end: { i: 4, j: 1 }, connected_from_start: false, connected_from_end: false }, // red      (1 on grid)
+    { start: { i: 1, j: 1 }, end: { i: 2, j: 2 }, connected_from_start: false, connected_from_end: false }, // green    (2 on grid)
+    { start: { i: 2, j: 1 }, end: { i: 1, j: 3 }, connected_from_start: false, connected_from_end: false }, // blue     (3 on grid)
+    { start: { i: 0, j: 3 }, end: { i: 4, j: 2 }, connected_from_start: false, connected_from_end: false }, // yellow   (4 on grid)
   ];
 
   // 0: none, 1: red, 2: green, 3: blue, 4: yellow
@@ -375,16 +406,14 @@ function power_game() {
             
             if (not_diagonal_1 || not_diagonal_2) lines[point_color].push({ i : mouse_i, j: mouse_j });
             
-            // If connected to end, Stop selecting piece!
+            // If connected to end, Stop selected piece!
             if (selected_from_start) {
               if ((lines[point_color][lines[point_color].length - 1].i == colors_points[point_color].end.i) && (lines[point_color][lines[point_color].length - 1].j == colors_points[point_color].end.j)) {
                 cut_connection();
-                matches++;
               }
             } else if (selected_from_end) {
               if ((lines[point_color][lines[point_color].length - 1].i == colors_points[point_color].start.i) && (lines[point_color][lines[point_color].length - 1].j == colors_points[point_color].start.j)) {
                 cut_connection();
-                matches++;
               }
             }
             
@@ -400,16 +429,14 @@ function power_game() {
                 
             if (not_diagonal_1 || not_diagonal_2) lines[point_color].push({ i : mouse_i, j: mouse_j });
             
-            // If connected to end, Stop selecting piece!
+            // If connected to end, Stop selected piece!
             if (selected_from_start) {
               if ((lines[point_color][lines[point_color].length - 1].i == colors_points[point_color].end.i) && (lines[point_color][lines[point_color].length - 1].j == colors_points[point_color].end.j)) {
                 cut_connection();
-                matches++;
               }
             } else if (selected_from_end) {
               if ((lines[point_color][lines[point_color].length - 1].i == colors_points[point_color].start.i) && (lines[point_color][lines[point_color].length - 1].j == colors_points[point_color].start.j)) {
                 cut_connection();
-                matches++;
               }
             }
             
@@ -418,13 +445,17 @@ function power_game() {
           }
               
           lines[collided_color] = [];
-          lines[point_color] = [];
+          lines[point_color]    = [];
           point_selected = false;
         }
       }
     }
     
-    if (matches == colors_connected.length) showAlert("okay", "You win!");
+    var matches = get_connections();
+    
+    if (matches == colors_count) {
+      if (player_win_alerts++ == 1) showAlert("okay", "You win!"); // Alert won't be shown multiple times!
+    }
   }
   
   function loop() {
@@ -470,11 +501,15 @@ function power_game() {
       
       if (aabb_first_point || aabb_second_point) {
         if (aabb_first_point) {
-          selected_from_start   = true;
-          selected_from_end     = false;
+          selected_from_start                   = true;
+          selected_from_end                     = false;
+          colors_points[i].selected_from_start  = true;
+          colors_points[i].selected_from_end    = false;
         } else {
-          selected_from_start   = false;
-          selected_from_end     = true;
+          selected_from_start                   = false;
+          selected_from_end                     = true;
+          colors_points[i].selected_from_start  = false;
+          colors_points[i].selected_from_end    = true;
         }
         
         point_selected = !point_selected;
