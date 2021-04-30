@@ -520,7 +520,7 @@ function power_game() {
   }
   
   document.addEventListener("keydown", function(e) {
-    if (e.which == 82) {
+    if (e.key == "r") {
       reset_game();
     }
   });
