@@ -43,11 +43,20 @@ const messages = [
         read: 0,
         visible: 0,
         content: `
-			<h3>Station 4</h3>
-            <p> Don’t mind the outage in my station. I tripped on those damn cables carrying my lunch back to my workstation. Noodles everywhere. I’ll ask Stacy to clean it up and I’ll get the pumps online in about 10 minutes.</p>
-            <p> Regards, </p>
-			<p> Dr. Carson </p>
-		`
+          <h3>Station 4</h3>
+                <p> Don’t mind the outage in my station. I tripped on those damn cables carrying my lunch back to my workstation. Noodles everywhere. I’ll ask Stacy to clean it up and I’ll get the pumps online in about 10 minutes.</p>
+                <p> Regards, </p>
+          <p> Dr. Carson </p>
+        `
+    },
+    {
+        id: 3,
+        title: "URS - AUTOMATED MONITORING",
+        read: 0,
+        visible: 1,
+        content: `
+            <h3>Anomaly detected at Station 1</h3>
+        `
     }
 ];
 
@@ -61,6 +70,13 @@ function populate_viewer( content ) {
         c.content = `<canvas id="power_game" width=300 height=300></canvas>` + c.content;
         r8_viewer.update( [c], (e, d, i) => {
           power_game();
+        })
+        return;
+    }
+    if( c.id == 3 ) {
+        c.content = `<canvas id="bar_game" width=300 height=300></canvas>` + c.content;
+        r8_viewer.update( [c], (e, d, i) => {
+        	bar_game();
         })
         return;
     }
