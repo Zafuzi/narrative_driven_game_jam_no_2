@@ -108,20 +108,30 @@ function start_game() {
 	}, 300);
 
   render_messages();
+  let interval = 2000;
+  if( DEV ) {
+    interval = 100;
+  }
   setInterval(function() {
     render_messages();
-  }, 2000);
+  }, interval);
 
   show_message(1, 10);
   show_message(0);
 }
 
 function show_message(id, timeout) {
-  setTimeout(function() {
-    if( ! messages[id] ) return;
-    messages[id].visible = 1;
-    messages_need_update = true;
-  }, timeout || 1000);
+  if(DEV) {
+      if( ! messages[id] ) return;
+      messages[id].visible = 1;
+      messages_need_update = true;
+  } else {
+    setTimeout(function() {
+      if( ! messages[id] ) return;
+      messages[id].visible = 1;
+      messages_need_update = true;
+    }, timeout || 1000);
+  }
 }
 
 let r8_viewer;
