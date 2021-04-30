@@ -290,6 +290,7 @@ function power_game() {
   var mouse_j               = 0;
   var logs                  = 0;
   var point_selected        = false;
+  var is_mouse_down         = false;
   var selected_from_start   = false;
   var selected_from_end     = false;
   var player_win_alerts     = 0;        // Just stops at 1 so just alerts once when player wins!
@@ -395,7 +396,7 @@ function power_game() {
       power_game_context.strokeRect((j * tile_width), (i * tile_height), tile_width, tile_height);
           
       // Add point to list of points of same color
-      if (point_selected && point_color >= 0) {
+      if (point_selected && is_mouse_down && point_color >= 0) {
         var point_obj = (lines[point_color].length > 1) ? lines[point_color][lines[point_color].length - 1] : lines[point_color][0];
               
         if (!point_obj) {
@@ -496,8 +497,14 @@ function power_game() {
     }
   }
   
+  power_game_canvas.onmouseup = function(e) {
+    update_mouse(e);
+    is_mouse_down = false;
+  };
+  
   power_game_canvas.onmousedown = function(e) {
     update_mouse(e);
+    is_mouse_down = true;
     
     for (var i = 0; i < colors_points.length; i++) {
       var p1 = point_pos(colors_points[i].start.i, colors_points[i].start.j);
