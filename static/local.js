@@ -17,31 +17,31 @@ const messages = [
         read: 0,
         visible: 1,
         content: `
-			<h3>Welcome to URS-1A</h3>
-			<br/>
-			<p>Abigail here! Hope you are settling in well. I know the first night down here can be a bit lonely, so I sent you my favorite song. It's not much company, but it's better than nothing!</p>
-			<br/>
-			<img src="https://media.giphy.com/media/3o7aTkzctUbDfzDJ84/giphy-downsized.gif">
-			<p>See ya around :)</p>
-			<br/>
-			<em>Abigail Treace</em>
-		`
+            <h3>Welcome to URS-1A!</h3>
+            <br/>
+            <p>Abigail here! Hope you are settling in well. I know the first night down here can be a bit lonely, so I sent you my favorite song. It's not much company, but it's better than nothing!</p>
+            <br/>
+            <img src="https://media.giphy.com/media/l2JHZ0dIcyFo5UQGQ/giphy.gif">
+            <p>See ya around :)</p>
+            <br/>
+            <em>Abigail Treace</em>
+        `
     },
     {
         id: 1,
-        title: "Power Game",
+        title: "URS - AUTOMATED MONITORING",
         read: 0,
         visible: 1,
         content: `
-        <h3>POWER DOWN - STATION 4</h3>
-		<p>Nascetur montes magnis feugiat velit nostra blandit magna eleifend, pharetra fringilla penatibus volutpat nulla mi cubilia, metus tortor a lectus quisque at mus. Suspendisse cum vulputate porta ridiculus venenatis etiam rutrum hac scelerisque platea phasellus posuere, lobortis lacinia curae nullam mauris imperdiet ut dapibus integer lacus. Eu in odio felis feugiat sed tortor viverra dui himenaeos fermentum consequat neque diam montes, mus dignissim blandit ut donec ac condimentum mattis vehicula egestas penatibus sodales varius.</p> <p>Erat per nibh facilisis sociis curae rutrum dui, dictumst mauris sollicitudin iaculis sagittis nullam ornare leo, nascetur luctus purus class pharetra feugiat. Non aliquam tincidunt volutpat per velit, molestie porttitor et habitasse primis, tempor nisl sagittis ante. Hendrerit etiam litora consequat leo torquent congue, mollis cubilia parturient sollicitudin gravida rhoncus suscipit, magna egestas odio fermentum purus.</p>
-		`
+          <h3>Anomaly detected at Station 4</h3>
+          <p>Nascetur montes magnis feugiat velit nostra blandit magna eleifend, pharetra fringilla penatibus volutpat nulla mi cubilia, metus tortor a lectus quisque at mus. Suspendisse cum vulputate porta ridiculus venenatis etiam rutrum hac scelerisque platea phasellus posuere, lobortis lacinia curae nullam mauris imperdiet ut dapibus integer lacus. Eu in odio felis feugiat sed tortor viverra dui himenaeos fermentum consequat neque diam montes, mus dignissim blandit ut donec ac condimentum mattis vehicula egestas penatibus sodales varius.</p> <p>Erat per nibh facilisis sociis curae rutrum dui, dictumst mauris sollicitudin iaculis sagittis nullam ornare leo, nascetur luctus purus class pharetra feugiat. Non aliquam tincidunt volutpat per velit, molestie porttitor et habitasse primis, tempor nisl sagittis ante. Hendrerit etiam litora consequat leo torquent congue, mollis cubilia parturient sollicitudin gravida rhoncus suscipit, magna egestas odio fermentum purus.</p>
+        `
     },
     {
         id: 2,
         title: "Dr. Carson",
         read: 0,
-        visible: 1,
+        visible: 0,
         content: `
 			<h3>Station 4</h3>
             <p> Don’t mind the outage in my station. I tripped on those damn cables carrying my lunch back to my workstation. Noodles everywhere. I’ll ask Stacy to clean it up and I’ll get the pumps online in about 10 minutes.</p>
