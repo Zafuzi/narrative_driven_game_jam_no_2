@@ -74,7 +74,7 @@ function populate_viewer( content ) {
         return;
     }
     if( c.id == 3 ) {
-        c.content = `<canvas id="bar_game" width=300 height=300></canvas>` + c.content;
+        c.content = `<canvas id="bar_game" width=400 height=50></canvas>` + c.content;
         r8_viewer.update( [c], (e, d, i) => {
         	bar_game();
         })
@@ -584,4 +584,51 @@ function power_game() {
   };
   
   window.requestAnimationFrame(loop); // Start game!
+}
+
+function bar_game() {
+  var bar_game_canvas   = document.getElementById("bar_game");
+  var bar_game_context  = bar_game_canvas.getContext("2d");
+  bar_game_context.fillStyle = "green";
+  
+  var meter_percent     = 10;
+  var speed             = 1;
+  var player_win_alerts = 0;
+  
+  function reset_game() {
+    meter_percent = 10;
+  }
+  
+  function render() {
+    bar_game_context.clearRect(0, 0, bar_game_canvas.width, bar_game_canvas.height);
+    bar_game_context.fillRect(0, 0, meter_percent, bar_game_canvas.height);
+  }
+  
+  function update() {
+    if (meter_percent > 0) meter_percent -= speed;
+  }
+  
+  function loop() {
+    update();
+    render();
+    window.requestAnimationFrame(loop);
+  }
+  
+  document.addEventListener("keyup", function(e) {
+    if (e.key == "r") {
+      reset_game();
+    }
+    
+    if (e.key == " ") {
+      meter_percent += speed * 30;
+      
+      if (meter_percent >= bar_game_canvas.width - speed * 30) {
+        if (player_win_alerts++ == 1) {
+          showAlert("okay", "You win!");
+        }
+      }
+    }
+  });
+  
+  window.requestAnimationFrame(loop);
 }
