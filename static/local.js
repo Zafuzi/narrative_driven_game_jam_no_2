@@ -121,8 +121,13 @@ function populate_viewer( content ) {
 let r8_message; // message template
 var messages_need_update = false;
 let T = 0;
-function render_messages() {
+
+function main_game_loop() {
 	T++;
+	render_messages();
+	window.requestAnimationFrame( main_game_loop );
+}
+function render_messages() {
 
 	if( ! r8_message )
 		r8_message = rplc8("#message");
@@ -162,7 +167,6 @@ function render_messages() {
 		show_message( nn );
 	}
 
-	window.requestAnimationFrame(render_messages);
 }
 
 function start_game() {
@@ -174,7 +178,12 @@ function start_game() {
 	}, 300);
 
 	show_message(0);
-	window.requestAnimationFrame( render_messages );
+	if( DEV ) {
+		messages.forEach( m => {
+			show_message(m.id);
+		});
+	}
+	window.requestAnimationFrame( main_game_loop );
 
 }
 
@@ -198,9 +207,6 @@ function init() {
 			start_game();
 		}, 300);
 	})
-
-	let o = {cmd: "log", msg: "Hello World!" }
-	rpc( o, console.log, console.error );
 
 	document.addEventListener("keydown", (ev) => {
 		if( keys_down.indexOf(ev.key) == -1 ) {
