@@ -265,11 +265,12 @@ function power_game() {
     }
 
     function check_lines_collision(c) {
-        if (lines[c].length > 1) {
+        if (lines[c].length > 0) {
             var self_collide = false;
+            
             // Iterate over line points, And detect similar, If found multiples of same point cut the connection directly!
             for (var x = 0; x < lines[c].length; x++) {
-                if (matches_in_array(lines[c][x], lines[c]) > 1) {
+                if (matches_in_array(lines[c][x], lines[c]) > 0) {
                     self_collide = true;
                 }
             }
@@ -278,13 +279,14 @@ function power_game() {
                 cut_connection(c);
             }
 
-            for (var y = 1; y < lines.length; y++) {
-                if (lines[y].length > 1) {
+            for (var y = 0; y < lines.length; y++) {
+                if (/*y != c && */lines[y].length > 0) {
                     for (var z = 0; z < lines[y].length; z++) {
                         for (var e = 0; e < lines[c].length; e++) {
-                            if (matches_in_array(lines[c][e], lines[y]) > 1) {
-                            cut_connection(y);
-                            //cut_connection(c, y);
+                            if (matches_in_array(lines[c][e], lines[y]) > 0) {
+                                //cut_connection(y);
+                                //cut_connection(y);
+                                cut_connection(c, y);
                             }
                         }
                     }
@@ -418,6 +420,12 @@ function power_game() {
             }
             draw_connection_lines(lines);
         }
+        
+        /*
+        for (var i = 0; i < lines.length; i++) {
+            if (lines[i].length > 0) check_lines_collision(i);
+        }
+        */
     }
 
     function update_mouse_input(i, j) {
@@ -430,7 +438,7 @@ function power_game() {
 
             // Add point to list of points of same color
             if (point_selected && is_mouse_down && point_color >= 0) {
-                var point_obj = (lines[point_color].length > 1) ? lines[point_color][lines[point_color].length - 1] : lines[point_color][0];
+                var point_obj = (lines[point_color].length > 0) ? lines[point_color][lines[point_color].length - 1] : lines[point_color][0];
 
                 if (!point_obj) {
                     if (selected_from_start) {
@@ -438,10 +446,12 @@ function power_game() {
                     } else {
                         point_obj = colors_points[point_color].end;
                     }
+                    
+                    check_lines_collision(point_color);
                     lines[point_color].push({ i : point_obj.i, j: point_obj.j });
                 }
 
-            if (grid[mouse_i][mouse_j] == 0 || grid[mouse_i][mouse_j] - 1 == point_color) {
+                if (grid[mouse_i][mouse_j] == 0 || grid[mouse_i][mouse_j] - 1 == point_color) {
                     if (point_obj.i != mouse_i || point_obj.j != mouse_j) {
                         // If not diagonal, Push!
                         var not_diagonal_1 = (mouse_i - point_obj.i != 0 && mouse_j - point_obj.j == 0);
@@ -452,16 +462,19 @@ function power_game() {
                         // If connected to end, Stop selected piece!
                         if (selected_from_start) {
                             if ((lines[point_color][lines[point_color].length - 1].i == colors_points[point_color].end.i) && (lines[point_color][lines[point_color].length - 1].j == colors_points[point_color].end.j)) {
+                                //check_lines_collision(point_color);
                                 cut_connection();
                             }
                         } else if (selected_from_end) {
                             if ((lines[point_color][lines[point_color].length - 1].i == colors_points[point_color].start.i) && (lines[point_color][lines[point_color].length - 1].j == colors_points[point_color].start.j)) {
+                                //check_lines_collision(point_color);
                                 cut_connection();
                             }
                         }
                     } else {
                         lines[point_color].pop();
                     }
+                    
                 } else {
                     if (point_obj.i != mouse_i || point_obj.j != mouse_j) {
                         // If not diagonal, Push!
@@ -473,22 +486,25 @@ function power_game() {
                         // If connected to end, Stop selected piece!
                         if (selected_from_start) {
                             if ((lines[point_color][lines[point_color].length - 1].i == colors_points[point_color].end.i) && (lines[point_color][lines[point_color].length - 1].j == colors_points[point_color].end.j)) {
+                                //check_lines_collision(point_color);
                                 cut_connection();
                             }
                         } else if (selected_from_end) {
                             if ((lines[point_color][lines[point_color].length - 1].i == colors_points[point_color].start.i) && (lines[point_color][lines[point_color].length - 1].j == colors_points[point_color].start.j)) {
+                                //check_lines_collision(point_color);
                                 cut_connection();
                             }
                         }
-
                     } else {
                         lines[point_color].pop();
                     }
 
                     lines[collided_color] = [];
-                    lines[point_color] = [];
+                    //lines[point_color] = [];
                     point_selected = false;
                 }
+                
+                //if (lines[point_color].length > 0) check_lines_collision(point_color);
             }
         }
     
