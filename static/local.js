@@ -76,7 +76,7 @@ function populate_viewer( content ) {
     if( c.id == 3 ) {
         c.content = `<canvas id="bar_game" width=300 height=300></canvas>` + c.content;
         r8_viewer.update( [c], (e, d, i) => {
-        	bar_game();
+			bar_game();
         })
         return;
     }
