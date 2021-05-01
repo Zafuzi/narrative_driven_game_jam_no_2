@@ -591,12 +591,13 @@ function bar_game() {
   var bar_game_context  = bar_game_canvas.getContext("2d");
   bar_game_context.fillStyle = "green";
   
-  var meter_percent     = 70;
+  var meter_percent     = 100;
   var speed             = 1;
+  var speed_multiplier  = 30;
   var player_win_alerts = 0;
   
   function reset_game() {
-    meter_percent = 70;
+    meter_percent = 100;
   }
   
   function render() {
@@ -605,7 +606,15 @@ function bar_game() {
   }
   
   function update() {
-    if (meter_percent > 0) meter_percent -= speed;
+    if (!(meter_percent - speed < 0)) {
+      meter_percent -= speed;
+    } else {
+      meter_percent = 0;
+    }
+    
+    if (meter_percent > bar_game_canvas.width) {
+      meter_percent = bar_game_canvas.width;
+    }
   }
   
   function loop() {
@@ -620,9 +629,9 @@ function bar_game() {
     }
     
     if (e.key == " ") {
-      meter_percent += speed * 30;
+      meter_percent += speed * speed_multiplier;
       
-      if (meter_percent >= bar_game_canvas.width - speed * 30) {
+      if (meter_percent >= bar_game_canvas.width - (speed * speed_multiplier)) {
         if (player_win_alerts++ == 1) {
           showAlert("okay", "You win!");
         }
