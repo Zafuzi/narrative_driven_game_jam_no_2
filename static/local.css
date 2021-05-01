@@ -1,144 +1,144 @@
 body, html {
-    background: none;
-    overflow: hidden;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+	background: none;
+	overflow: hidden;
+	display: flex;
+	justify-content: center;
+	align-items: center;
 }
 
 img {
-  max-width: 300px;
-  max-height: 300px;
-  object-fit: contain;
+	max-width: 300px;
+	max-height: 300px;
+	object-fit: contain;
 }
 
 #bg {
-  position: absolute;
-  top: -45px;
-  left: -45px;
-  width: calc( 100vw + 90px );
-  height: calc( 100vh + 90px );
-  display: block;
-  filter: blur(45px);
-  -webkit-filter: blur(45px);
-  background-image: url('images/undersea.jpg');
-  background-position: center center;
-  background-size: cover;
-  object-fit: cover;
-  z-index: -1;
+	position: absolute;
+	top: -45px;
+	left: -45px;
+	width: calc( 100vw + 90px );
+	height: calc( 100vh + 90px );
+	display: block;
+	filter: blur(45px);
+	-webkit-filter: blur(45px);
+	background-image: url('images/undersea.jpg');
+	background-position: center center;
+	background-size: cover;
+	object-fit: cover;
+	z-index: -1;
 }
 
 #main_menu {
-    width: 100%;
-    height: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    color: #fff;
-    background-color: rgba(0, 0, 0, .8);
-    flex-flow: column;
-    opacity: 0;
-    transition: opacity 0.3s ease-in-out;
-    z-index: 99;
+	width: 100%;
+	height: 100%;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	color: #fff;
+	background-color: rgba(0, 0, 0, .8);
+	flex-flow: column;
+	opacity: 0;
+	transition: opacity 0.3s ease-in-out;
+	z-index: 99;
 }
 
 #main_menu.active {
-    opacity: 1;
+	opacity: 1;
 }
 
 #main_menu h1 {
-    font-size: 64pt;
-    font-family: 'Megrim', system, sans-serif;
+	font-size: 64pt;
+	font-family: 'Megrim', system, sans-serif;
 }
 
 #play_button {
-    padding: 0.3em;
-    background: none;
-    color: #FFF;
-    font-size: 18pt;
-    font-weight: bold;
-    margin: 4em;
-    border: 2px solid #FFF;
-    cursor: pointer;
-    border-radius: 14px;
+	padding: 0.3em;
+	background: none;
+	color: #FFF;
+	font-size: 18pt;
+	font-weight: bold;
+	margin: 4em;
+	border: 2px solid #FFF;
+	cursor: pointer;
+	border-radius: 14px;
 }
 
 #main_game {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  grid-template-rows: 1fr 1fr;
-  max-width: 800px;
-  max-height: 600px;
-  grid-column-gap: 12px;
-  grid-row-gap: 12px;
-  padding: 12px;
-  width: 100%;
-  height: 100%;
-  opacity: 0;
-  transition: opacity 0.3s ease-in-out;
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	grid-template-rows: 1fr 1fr;
+	max-width: 800px;
+	max-height: 600px;
+	grid-column-gap: 12px;
+	grid-row-gap: 12px;
+	padding: 12px;
+	width: 100%;
+	height: 100%;
+	opacity: 0;
+	transition: opacity 0.3s ease-in-out;
 }
 
 #main_game.active {
-  opacity: 1;
+	opacity: 1;
 }
 
 #main_game > div {
-  display: block;
-  background: rgba(255, 255, 255, .5);
+	display: block;
+	background: rgba(255, 255, 255, .5);
 }
 
 #view_screen {
-  grid-column: 2 / -1;
-  grid-row: 1 / -1;
-  height: 100%;
-  display: grid;
-  grid-template-columns: 1fr;
-  overflow: hidden;
+	grid-column: 2 / -1;
+	grid-row: 1 / -1;
+	height: 100%;
+	display: grid;
+	grid-template-columns: 1fr;
+	overflow: hidden;
 }
 
 #messages {
-  padding: 0.3em;
+	padding: 0.3em;
 }
 
 .message {
-  padding: 1em;
-  margin: 0.3em;
-  border-radius: 4px;
-  height: 64px;
-  overflow: hidden;
-  font-size: 12px;
-  background: rgba(255, 255, 255, 0.8);
-  border: 4px solid rgba(255, 255, 255, 0.8);
+	padding: 1em;
+	margin: 0.3em;
+	border-radius: 4px;
+	height: 64px;
+	overflow: hidden;
+	font-size: 12px;
+	background: rgba(255, 255, 255, 0.8);
+	border: 4px solid rgba(255, 255, 255, 0.8);
 }
 
 .message.no-clip {
-  margin: 0;
-  padding: 2em 1em;
-  height: 100%;
-  overflow-y: auto;
+	margin: 0;
+	padding: 2em 1em;
+	height: 100%;
+	overflow-y: auto;
 }
 
 .message.message_read {
-  opacity: 0.8;
-  background: rgba(255, 255, 255, 0.2);
-  border: 4px solid rgba(255, 255, 255, 0.2);
+	opacity: 0.8;
+	background: rgba(255, 255, 255, 0.2);
+	border: 4px solid rgba(255, 255, 255, 0.2);
 }
 
 .message:not(.no-clip):hover {
-  background: #f39106;
-  border: 4px solid #111;
-  cursor: pointer;
+	background: #f39106;
+	border: 4px solid #111;
+	cursor: pointer;
 }
 
 .message .content {
-  text-overflow: ellipsis;
-  max-width: 100%;
-  max-height: 12px;
+	text-overflow: ellipsis;
+	max-width: 100%;
+	max-height: 12px;
 }
 
 .message .content.no-clip {
-  font-size: 14pt;
-  line-height: 1.4;
-  height: unset;
-  max-height: unset;
+	font-size: 14pt;
+	line-height: 1.4;
+	height: unset;
+	max-height: unset;
 }
