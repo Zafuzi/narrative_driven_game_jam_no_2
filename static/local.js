@@ -12,9 +12,9 @@ var current_message = 0;
 // anything with a visible: 1 will be shown in the messages list in the game
 const messages = [
     {
-        id: 0,
-        title: "URS-1A - Dr. Treace",
-        read: 0,
+		id: 0,
+		title: "URS-1A - Dr. Treace",
+		read: 0,
 		visible: 0,
         content: `
             <h3>Welcome to URS-1A!</h3>
