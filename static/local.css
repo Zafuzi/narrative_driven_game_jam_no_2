@@ -98,6 +98,7 @@ img {
 
 #messages {
 	padding: 0.3em;
+	overflow-y: auto;
 }
 
 .message {
