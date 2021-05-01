@@ -235,23 +235,23 @@ function power_game() {
 	}
 
 	function cut_connection(c, d) {
-		selected_from_start						= false;
-		selected_from_end						= false;
+		selected_from_start = false;
+		selected_from_end = false;
 		
 		if (c) {
-			lines[c]								= [];
-			colors_points[c].selected_from_start	= false;
-			colors_points[c].selected_from_end		= false;
+			lines[c] = [];
+			colors_points[c].selected_from_start = false;
+			colors_points[c].selected_from_end = false;
 		}
 		
 		if (d) {
-			lines[d]								= [];
-			colors_points[d].selected_from_start	= false;
-			colors_points[d].selected_from_end		= false;
+			lines[d] = [];
+			colors_points[d].selected_from_start = false;
+			colors_points[d].selected_from_end = false;
 		}
 		
-		point_selected							= false;
-		point_color								= -1;
+		point_selected = false;
+		point_color = -1;
 	}
 
 	function matches_in_array(e, a) {
@@ -293,24 +293,24 @@ function power_game() {
 		}
 	}
 
-	var power_game_canvas		= document.getElementById("power_game");
-	var power_game_context	= power_game_canvas.getContext("2d");
-	var mouse_x				= 0;
-	var mouse_y				= 0;
-	var mouse_i				= 0;
-	var mouse_j				= 0;
-	var point_selected		= false;
-	var is_mouse_down			= false;
+	var power_game_canvas = document.getElementById("power_game");
+	var power_game_context = power_game_canvas.getContext("2d");
+	var mouse_x = 0;
+	var mouse_y = 0;
+	var mouse_i = 0;
+	var mouse_j = 0;
+	var point_selected = false;
+	var is_mouse_down = false;
 	var selected_from_start	= false;
-	var selected_from_end		= false;
-	var player_win_alerts		= 0;		// Just stops at 1 so just alerts once when player wins!
-	var collided_color		= 0;
-	var point_color			= -1;
-	var colors_count			= 4;
-	var colors_pal1			= [ "blank", "red", "green", "blue", "yellow" ];
-	var colors_pal2			= [ "red", "green", "blue", "yellow", "blank" ];
-	var tile_width			= power_game_canvas.width / 5;
-	var tile_height			= power_game_canvas.height / 5;
+	var selected_from_end = false;
+	var player_win_alerts = 0;		// Just stops at 1 so just alerts once when player wins!
+	var collided_color = 0;
+	var point_color = -1;
+	var colors_count = 4;
+	var colors_pal1 = [ "blank", "red", "green", "blue", "yellow" ];
+	var colors_pal2 = [ "red", "green", "blue", "yellow", "blank" ];
+	var tile_width = power_game_canvas.width / 5;
+	var tile_height = power_game_canvas.height / 5;
 
 	// Handling connection idea (Rabia):
 	// 1. Player clicks on point. [x] 
@@ -551,15 +551,15 @@ function power_game() {
 
 			if (aabb_first_point || aabb_second_point) {
 				if (aabb_first_point) {
-					selected_from_start					= true;
-					selected_from_end						= false;
-					colors_points[i].selected_from_start	= true;
-					colors_points[i].selected_from_end	= false;
+					selected_from_start = true;
+					selected_from_end = false;
+					colors_points[i].selected_from_start = true;
+					colors_points[i].selected_from_end = false;
 				} else {
-					selected_from_start					= false;
-					selected_from_end						= true;
-					colors_points[i].selected_from_start	= false;
-					colors_points[i].selected_from_end	= true;
+					selected_from_start	= false;
+					selected_from_end = true;
+					colors_points[i].selected_from_start = false;
+					colors_points[i].selected_from_end = true;
 				}
 
 				point_selected = !point_selected;
@@ -575,57 +575,57 @@ function power_game() {
 }
 
 function bar_game() {
-  var bar_game_canvas   = document.getElementById("bar_game");
-  var bar_game_context  = bar_game_canvas.getContext("2d");
-  bar_game_context.fillStyle = "green";
+	var bar_game_canvas   = document.getElementById("bar_game");
+	var bar_game_context  = bar_game_canvas.getContext("2d");
+	bar_game_context.fillStyle = "green";
   
-  var meter_percent     = 100;
-  var speed             = 1;
-  var speed_multiplier  = 30;
-  var player_win_alerts = 0;
+	var meter_percent = 100;
+	var speed = 1;
+	var speed_multiplier = 30;
+	var player_win_alerts = 0;
   
-  function reset_game() {
-    meter_percent = 100;
-  }
+	function reset_game() {
+		meter_percent = 100;
+	}
   
-  function render() {
-    bar_game_context.clearRect(0, 0, bar_game_canvas.width, bar_game_canvas.height);
-    bar_game_context.fillRect(0, 0, meter_percent, bar_game_canvas.height);
-  }
+	function render() {
+		bar_game_context.clearRect(0, 0, bar_game_canvas.width, bar_game_canvas.height);
+		bar_game_context.fillRect(0, 0, meter_percent, bar_game_canvas.height);
+	}
   
-  function update() {
-    if (!(meter_percent - speed < 0)) {
-      meter_percent -= speed;
-    } else {
-      meter_percent = 0;
-    }
+	function update() {
+		if (!(meter_percent - speed < 0)) {
+			meter_percent -= speed;
+		} else {
+			meter_percent = 0;
+		}
     
-    if (meter_percent > bar_game_canvas.width) {
-      meter_percent = bar_game_canvas.width;
-    }
-  }
+		if (meter_percent > bar_game_canvas.width) {
+			meter_percent = bar_game_canvas.width;
+		}
+	}
   
-  function loop() {
-    update();
-    render();
-    window.requestAnimationFrame(loop);
-  }
+	function loop() {
+		update();
+		render();
+		window.requestAnimationFrame(loop);
+	}
   
-  document.addEventListener("keyup", function(e) {
-    if (e.key == "r") {
-      reset_game();
-    }
+	document.addEventListener("keyup", function(e) {
+		if (e.key == "r") {
+			reset_game();
+		}
     
-    if (e.key == " ") {
-      meter_percent += speed * speed_multiplier;
+		if (e.key == " ") {
+			meter_percent += speed * speed_multiplier;
       
-      if (meter_percent >= bar_game_canvas.width - (speed * speed_multiplier)) {
-        if (player_win_alerts++ == 1) {
-          showAlert("okay", "You win!");
-        }
-      }
-    }
-  });
+			if (meter_percent >= bar_game_canvas.width - (speed * speed_multiplier)) {
+				if (player_win_alerts++ == 1) {
+					showAlert("okay", "You win!");
+				}
+			}
+		}
+	});
   
-  window.requestAnimationFrame(loop);
+	window.requestAnimationFrame(loop);
 }
