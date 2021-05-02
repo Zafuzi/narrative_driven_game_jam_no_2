@@ -155,7 +155,7 @@ function render_messages() {
 				e.classList.add("message_read");
 				populate_viewer( [d] );
 			});
-		})
+		});
 	}
 
 
