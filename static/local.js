@@ -251,19 +251,19 @@ function power_game() {
 
 	let points = [
 			{ color: "red", x: 0, y: 0, connected: null, line_drawn: 0 },
-			{ color: "red", x: 0, y: 4, connected: null, line_drawn: 0 },
+			{ color: "red", x: 4, y: 4, connected: null, line_drawn: 0 },
 
 			{ color: "green", x: 1, y: 0, connected: null, line_drawn: 0 },
-			{ color: "green", x: 1, y: 4, connected: null, line_drawn: 0 },
+			{ color: "green", x: 2, y: 4, connected: null, line_drawn: 0 },
 			
 			{ color: "blue", x: 2, y: 0, connected: null, line_drawn: 0 },
-			{ color: "blue", x: 2, y: 4, connected: null, line_drawn: 0 },
+			{ color: "blue", x: 0, y: 4, connected: null, line_drawn: 0 },
 
 			{ color: "magenta", x: 3, y: 0, connected: null, line_drawn: 0 },
 			{ color: "magenta", x: 3, y: 4, connected: null, line_drawn: 0 },
 
 			{ color: "yellow", x: 4, y: 0, connected: null, line_drawn: 0 },
-			{ color: "yellow", x: 4, y: 4, connected: null, line_drawn: 0 },
+			{ color: "yellow", x: 1, y: 4, connected: null, line_drawn: 0 },
 	];
 
 	let fill_color = "blank";
