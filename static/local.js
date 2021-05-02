@@ -17,7 +17,7 @@ const messages = [
 		read: 0,
 		visible: 1,
 		done: 0,
-		next: 1000,
+		next: 400,
 		content: `
 			<h3>Welcome to URS-1A!</h3>
 			<br/>
@@ -35,7 +35,7 @@ const messages = [
 		read: 0,
 		visible: 0,
 		done: 0,
-		next: 500,
+		next: 200,
 		content: `
 			<h3>Anomaly detected at Station 4</h3>
 			<p>Station 4 has lost power</p>
@@ -56,7 +56,7 @@ const messages = [
 			<p> Regards, </p>
 			<p> Dr. Carson </p>
 		`,
-		next: 500
+		next: 400
 	},
 	{
 		id: 3,
@@ -73,10 +73,28 @@ const messages = [
 			<p> See ya around, </p>
 			<p> Mr. Grey </p>
 		`,
-		next: 1000
+		next: 200
 	},
 	{
 		id: 4,
+		title: "SPAM EMAIL ABOUT PIZZA",
+		read: 0,
+		visible: 0,
+		done: 0,
+		content: `
+			<h3>PIZZA! PIZZA! PIZZA!</h3>
+			<img src="https://picsum.photos/300/300">
+			<p>Up to 50% off with qualifying orders!</p>
+			<br/>
+			<p> DEV NOTE ask voice actor to do funny quip about getting pizza "20,000 leagues under"</p>
+			<p> DEV NOTE keep these notes in here to satisfy the meta...</p>
+			<p> DEV NOTE Maybe that's too on the nose?</p>
+			<p> DEV NOTE Who cares, we are working for free. <em>WE</em> aren't even getting pizza.</p>
+		`,
+		next: 200
+	},
+	{
+		id: 5,
 		title: "URS - AUTOMATED MONITORING",
 		read: 0,
 		visible: 0,
@@ -84,8 +102,21 @@ const messages = [
 		content: `
 			<h3>Anomaly detected at Station 1</h3>
 			<p>Press space to move the station back into the currents</p>
+		`,
+		next: 400
+	},
+	{
+		id: 6,
+		title: "URS - AUTOMATED MONITORING",
+		read: 0,
+		visible: 0,
+		done: 0,
+		content: `
+			<h3>SECURITY FOOTAGE DIGEST - ${Date.now()}</h3>
+			<p>Unauthorized entry into airlock D on Station 1.</p>
+			<button id="report_button">REPORT</button>
 		`
-	}
+	},
 ];
 
 
@@ -105,7 +136,7 @@ function populate_viewer( content ) {
 			})
 			return;
 		}
-		if( c.id == 4 ) {
+		if( c.id == 5 ) {
 			c.content = `<canvas id="bar_game" width=300 height=300></canvas>` + c.content;
 			r8_viewer.update( [c], (e, d, i) => {
 				bar_game();
@@ -114,7 +145,7 @@ function populate_viewer( content ) {
 		}
 
 		r8_viewer.update( [c], (e, d, i) => {
-			messages[ c.id ].done = 1;
+			messages[ d.id ].done = 1;
 		});
 	} else {
 		r8_viewer.update( c )
@@ -166,6 +197,8 @@ function render_messages() {
 	// and current message is done
 	// and current message has waited long enough
 	// show the next message
+	if( ! cm.next ) cm.next = 200;
+	if( ! nm.next ) nm.next = 200;
 	if( nm && !nm.visible && cm.done && T > cm.next + (cm.read_time || 0) ) {
 		show_message( nn );
 	}

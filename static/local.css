@@ -101,6 +101,11 @@ img {
 	overflow-y: auto;
 }
 
+#messages > h2 {
+	margin: 0.4em 0.1em;
+	color: #525252;
+}
+
 .message {
 	padding: 1em;
 	margin: 0.3em;
