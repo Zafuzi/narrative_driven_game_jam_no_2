@@ -209,17 +209,17 @@ function init() {
 			main_menu.classList.add("hid");	
 			start_game();
 		}, 300);
-	})
-
+	});
+	
 	document.addEventListener("keydown", (ev) => {
 		if( keys_down.indexOf(ev.key) == -1 ) {
 			keys_down.push( ev.key );
 		}
-	})
+	});
 
 	document.addEventListener("keyup", (ev) => {
 		keys_down.splice(keys_down.indexOf(ev.key), 1);
-	})
+	});
 
 	if( ! DEV ) {
 		main_menu.classList.remove("hid");	
@@ -400,6 +400,8 @@ function bar_game() {
                     showAlert("okay", "You win!");
                 }
             }
+            
+            e.preventDefault(); // Prevent game page from scrolling down if not in fullscreen mode.
         }
     });
   
