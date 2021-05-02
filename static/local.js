@@ -56,7 +56,7 @@ const messages = [
 			<p> Regards, </p>
 			<p> Dr. Carson </p>
 		`,
-		next: 1000
+		next: 500
 	},
 	{
 		id: 3,
@@ -73,7 +73,7 @@ const messages = [
 			<p> See ya around, </p>
 			<p> Mr. Grey </p>
 		`,
-		next: 4000
+		next: 1000
 	},
 	{
 		id: 4,
@@ -81,7 +81,10 @@ const messages = [
 		read: 0,
 		visible: 0,
 		done: 0,
-		content: ` <h3>Anomaly detected at Station 1</h3> `
+		content: `
+			<h3>Anomaly detected at Station 1</h3>
+			<p>Press space to move the station back into the currents</p>
+		`
 	}
 ];
 
@@ -152,7 +155,7 @@ function render_messages() {
 				e.classList.add("message_read");
 				populate_viewer( [d] );
 			});
-		})
+		});
 	}
 
 
@@ -230,6 +233,8 @@ function init() {
 
 function power_game() {
 
+	let frame = null;
+
 	let canvas = QS("#power_game")[0];
 			console.log( canvas );
 			canvas.style.backgroundColor = "#111";
@@ -246,19 +251,19 @@ function power_game() {
 
 	let points = [
 			{ color: "red", x: 0, y: 0, connected: null, line_drawn: 0 },
-			{ color: "red", x: 0, y: 4, connected: null, line_drawn: 0 },
+			{ color: "red", x: 4, y: 4, connected: null, line_drawn: 0 },
 
 			{ color: "green", x: 1, y: 0, connected: null, line_drawn: 0 },
-			{ color: "green", x: 1, y: 4, connected: null, line_drawn: 0 },
+			{ color: "green", x: 2, y: 4, connected: null, line_drawn: 0 },
 			
 			{ color: "blue", x: 2, y: 0, connected: null, line_drawn: 0 },
-			{ color: "blue", x: 2, y: 4, connected: null, line_drawn: 0 },
+			{ color: "blue", x: 0, y: 4, connected: null, line_drawn: 0 },
 
 			{ color: "magenta", x: 3, y: 0, connected: null, line_drawn: 0 },
 			{ color: "magenta", x: 3, y: 4, connected: null, line_drawn: 0 },
 
 			{ color: "yellow", x: 4, y: 0, connected: null, line_drawn: 0 },
-			{ color: "yellow", x: 4, y: 4, connected: null, line_drawn: 0 },
+			{ color: "yellow", x: 1, y: 4, connected: null, line_drawn: 0 },
 	];
 
 	let fill_color = "blank";
@@ -266,11 +271,12 @@ function power_game() {
 
 	let update = function() {
 
+		let connected_count = 0;
 		// if mouse is down
 		// and we clicked on a point
 		// set the current point
-		if( mouse_down ) {
-			points.forEach( p => {
+		points.forEach( p => {
+			if( mouse_down ) {
 				if( current_point == p ) return;
 				if( p.connected ) return;
 				let click = AABB( mx, my, 1, 1, p.x * tile_width, p.y * tile_height, tile_width, tile_height );
@@ -284,8 +290,17 @@ function power_game() {
 						current_point = p;
 					}
 				}
-			});
-		}
+			}
+
+			if( p.connected ) { connected_count++; }
+		});
+
+		if( connected_count == points.length ) {
+			messages[1].done = 1;
+			messages[1].read_time = T; // reset read time to actuall mean done time in this case
+			showAlert("okay", "Power restored");
+		}	
+
 	}
 
 	let draw = function() {
@@ -318,22 +333,83 @@ function power_game() {
 	}
 
 	let loop = function() {
+		if( messages[1].done == 1 ) {
+			window.cancelAnimationFrame( frame );
+			loop = null;
+			return;
+		}
 		update();
 		draw();
-		window.requestAnimationFrame( loop );
+		frame = window.requestAnimationFrame( loop );
 	}
 
 	canvas.addEventListener("mousedown", () => { mouse_down = true; } );
 	canvas.addEventListener("mouseup", () => { mouse_down = false; current_point = null; } );
 	canvas.addEventListener("mousemove", update_mouse);
 
-  window.requestAnimationFrame(loop); // Start game!
+  frame = window.requestAnimationFrame(loop); // Start game!
 
 	// Updates mouse pos and info!
 	function update_mouse(e) {
 		mx = (e.clientX || e.pageX) - canvas.getBoundingClientRect().left;
 		my = (e.clientY || e.pageY) - canvas.getBoundingClientRect().top;
 	}
+}
+
+function bar_game() {
+    var bar_game_canvas = document.getElementById("bar_game");
+    var bar_game_context = bar_game_canvas.getContext("2d");
+    bar_game_context.fillStyle = "green";
+  
+    var meter_percent = 100;
+    var speed = 1;
+    var speed_multiplier = 30;
+    var player_win_alerts = 0;
+  
+    function reset_game() {
+        meter_percent = 100;
+    }
+  
+    function render() {
+        bar_game_context.clearRect(0, 0, bar_game_canvas.width, bar_game_canvas.height);
+        bar_game_context.fillRect(0, 0, meter_percent, bar_game_canvas.height);
+    }
+  
+    function update() {
+        if (!(meter_percent - speed < 0)) {
+            meter_percent -= speed;
+        } else {
+            meter_percent = 0;
+        }
+    
+        if (meter_percent > bar_game_canvas.width) {
+            meter_percent = bar_game_canvas.width;
+        }
+    }
+    
+    document.addEventListener("keypress", function(e) {
+        if (e.key == "r") {
+            reset_game();
+        }
+        
+        if (e.key == " ") {
+            meter_percent += speed * speed_multiplier;
+      
+            if (meter_percent >= bar_game_canvas.width - (speed * speed_multiplier)) {
+                if (player_win_alerts++ == 1) {
+                    showAlert("okay", "You win!");
+                }
+            }
+        }
+    });
+  
+    function loop() {
+        update();
+        render();
+        window.requestAnimationFrame(loop);
+    }
+    
+    window.requestAnimationFrame(loop); // Start bar game!
 }
 
 // Detects collision between 2 rectangles...
