@@ -56,7 +56,7 @@ const messages = [
 			<p> Regards, </p>
 			<p> Dr. Carson </p>
 		`,
-		next: 1000
+		next: 500
 	},
 	{
 		id: 3,
@@ -73,7 +73,7 @@ const messages = [
 			<p> See ya around, </p>
 			<p> Mr. Grey </p>
 		`,
-		next: 4000
+		next: 1000
 	},
 	{
 		id: 4,
@@ -81,7 +81,10 @@ const messages = [
 		read: 0,
 		visible: 0,
 		done: 0,
-		content: ` <h3>Anomaly detected at Station 1</h3> `
+		content: `
+			<h3>Anomaly detected at Station 1</h3>
+			<p>Press space to move the station back into the currents</p>
+		`
 	}
 ];
 
@@ -230,6 +233,8 @@ function init() {
 
 function power_game() {
 
+	let frame = null;
+
 	let canvas = QS("#power_game")[0];
 			console.log( canvas );
 			canvas.style.backgroundColor = "#111";
@@ -266,11 +271,12 @@ function power_game() {
 
 	let update = function() {
 
+		let connected_count = 0;
 		// if mouse is down
 		// and we clicked on a point
 		// set the current point
-		if( mouse_down ) {
-			points.forEach( p => {
+		points.forEach( p => {
+			if( mouse_down ) {
 				if( current_point == p ) return;
 				if( p.connected ) return;
 				let click = AABB( mx, my, 1, 1, p.x * tile_width, p.y * tile_height, tile_width, tile_height );
@@ -284,8 +290,17 @@ function power_game() {
 						current_point = p;
 					}
 				}
-			});
-		}
+			}
+
+			if( p.connected ) { connected_count++; }
+		});
+
+		if( connected_count == points.length ) {
+			messages[1].done = 1;
+			messages[1].read_time = T; // reset read time to actuall mean done time in this case
+			showAlert("okay", "Power restored");
+		}	
+
 	}
 
 	let draw = function() {
@@ -318,16 +333,21 @@ function power_game() {
 	}
 
 	let loop = function() {
+		if( messages[1].done == 1 ) {
+			window.cancelAnimationFrame( frame );
+			loop = null;
+			return;
+		}
 		update();
 		draw();
-		window.requestAnimationFrame( loop );
+		frame = window.requestAnimationFrame( loop );
 	}
 
 	canvas.addEventListener("mousedown", () => { mouse_down = true; } );
 	canvas.addEventListener("mouseup", () => { mouse_down = false; current_point = null; } );
 	canvas.addEventListener("mousemove", update_mouse);
 
-  window.requestAnimationFrame(loop); // Start game!
+  frame = window.requestAnimationFrame(loop); // Start game!
 
 	// Updates mouse pos and info!
 	function update_mouse(e) {
