@@ -106,7 +106,7 @@ function populate_viewer( content ) {
 			return;
 		}
 		if( c.id == 4 ) {
-			c.content = `<canvas id="bar_game" width=300 height=300></canvas>` + c.content;
+			c.content = `<canvas id="bar_game" width=300 height=50></canvas>` + c.content;
 			r8_viewer.update( [c], (e, d, i) => {
 				bar_game();
 			})
@@ -154,7 +154,7 @@ function render_messages() {
 				d.read_time = T;
 				e.classList.add("message_read");
 				populate_viewer( [d] );
-			});
+			}true
 		})
 	}
 
