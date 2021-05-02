@@ -5,7 +5,7 @@ const HERE = require("path").dirname( module.filename );
 require( "sleepless" ).globalize();
 const	connect			= require("connect"),
 		serve_static 	= require( "serve-static" ),
-		L = log5.mkLog( "\tmicro_server: " )(5);
+		L				= log5.mkLog( "\tmicro_server: " )(5);
 
 const app = connect();
 

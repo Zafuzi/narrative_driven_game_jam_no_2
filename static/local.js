@@ -3,7 +3,7 @@ document.addEventListener("DOMContentLoaded", dcl => {
 	init();
 })
 
-const DEV = true;
+const DEV = false;
 
 var keys_down = [];
 
@@ -11,136 +11,195 @@ var current_message = 0;
 
 // anything with a visible: 1 will be shown in the messages list in the game
 const messages = [
-    {
-        id: 0,
-        title: "URS-1A - Dr. Treace",
-        read: 0,
-        visible: 0,
-        content: `
-            <h3>Welcome to URS-1A!</h3>
-            <br/>
-            <p>Abigail here! Hope you are settling in well. I know the first night down here can be a bit lonely, so I sent you my favorite song. It's not much company, but it's better than nothing!</p>
-            <br/>
-            <img src="https://media.giphy.com/media/l2JHZ0dIcyFo5UQGQ/giphy.gif">
-            <p>See ya around :)</p>
-            <br/>
-            <em>Abigail Treace</em>
-        `
-    },
-    {
-        id: 1,
-        title: "URS - AUTOMATED MONITORING",
-        read: 0,
-        visible: 0,
-        content: `
-          <h3>Anomaly detected at Station 4</h3>
-          <p>Nascetur montes magnis feugiat velit nostra blandit magna eleifend, pharetra fringilla penatibus volutpat nulla mi cubilia, metus tortor a lectus quisque at mus. Suspendisse cum vulputate porta ridiculus venenatis etiam rutrum hac scelerisque platea phasellus posuere, lobortis lacinia curae nullam mauris imperdiet ut dapibus integer lacus. Eu in odio felis feugiat sed tortor viverra dui himenaeos fermentum consequat neque diam montes, mus dignissim blandit ut donec ac condimentum mattis vehicula egestas penatibus sodales varius.</p> <p>Erat per nibh facilisis sociis curae rutrum dui, dictumst mauris sollicitudin iaculis sagittis nullam ornare leo, nascetur luctus purus class pharetra feugiat. Non aliquam tincidunt volutpat per velit, molestie porttitor et habitasse primis, tempor nisl sagittis ante. Hendrerit etiam litora consequat leo torquent congue, mollis cubilia parturient sollicitudin gravida rhoncus suscipit, magna egestas odio fermentum purus.</p>
-        `
-    },
-    {
-        id: 2,
-        title: "Dr. Carson",
-        read: 0,
-        visible: 0,
-        content: `
-			<h3>Station 4</h3>
-            <p> Don’t mind the outage in my station. I tripped on those damn cables carrying my lunch back to my workstation. Noodles everywhere. I’ll ask Stacy to clean it up and I’ll get the pumps online in about 10 minutes.</p>
-            <p> Regards, </p>
-			<p> Dr. Carson </p>
+	{
+		id: 0,
+		title: "URS-1A - Dr. Treace",
+		read: 0,
+		visible: 1,
+		done: 0,
+		next: 1000,
+		content: `
+			<h3>Welcome to URS-1A!</h3>
+			<br/>
+			<p>Abigail here! Hope you are settling in well. I know the first night down here can be a bit lonely, so I sent you my favorite song. It's not much company, but it's better than nothing!</p>
+			<br/>
+			<img src="https://media.giphy.com/media/l2JHZ0dIcyFo5UQGQ/giphy.gif">
+			<p>See ya around :)</p>
+			<br/>
+			<em>Abigail Treace</em>
 		`
-    }
+	},
+	{
+		id: 1,
+		title: "URS - AUTOMATED MONITORING",
+		read: 0,
+		visible: 0,
+		done: 0,
+		next: 500,
+		content: `
+			<h3>Anomaly detected at Station 4</h3>
+			<p>Station 4 has lost power</p>
+			<p>Connect the wire to bring the station back online.</p>
+		`
+	},
+	{
+		id: 2,
+		title: "Dr. Carson",
+		read: 0,
+		visible: 0,
+		done: 0,
+		content: `
+			<h3>Station 4</h3>
+			<br/>
+			<p> Sorry about the outage. I tripped on those damn cables carrying my lunch back to my workstation. Noodles everywhere. I’ll ask Stacy to clean it up.</p>
+			<br/>
+			<p> Regards, </p>
+			<p> Dr. Carson </p>
+		`,
+		next: 1000
+	},
+	{
+		id: 3,
+		title: "Mr. Grey",
+		read: 0,
+		visible: 0,
+		done: 0,
+		content: `
+			<h3>Station 4</h3>
+			<br/>
+			<p> Everything looks good down here, Dr. Carson explained the situation and you got everything back online quickly enough, so no need to report anything to the higher ups. </p>
+			<p> Oh! Also, welcome to the team. Glad to have another <em>normie</em> around here. These scientists are a bit nuts </p>
+			<br/>
+			<p> See ya around, </p>
+			<p> Mr. Grey </p>
+		`,
+		next: 4000
+	},
+	{
+		id: 4,
+		title: "URS - AUTOMATED MONITORING",
+		read: 0,
+		visible: 0,
+		done: 0,
+		content: ` <h3>Anomaly detected at Station 1</h3> `
+	}
 ];
 
 
 function populate_viewer( content ) {
-  let c = Object.assign({}, content[0]); 
-  if( c )
-  {
-    current_message = c.id;
-    if( c.id == 1 ) {
-        c.content = `<canvas id="power_game" width=300 height=300></canvas>` + c.content;
-        r8_viewer.update( [c], (e, d, i) => {
-          power_game();
-        })
-        return;
-    }
-    r8_viewer.update( [c] );
-  } else {
-    r8_viewer.update( c )
-  }
+	if( content.length == 0 ) {
+		// nothing to do
+		return;
+	}
+	let c = Object.assign({}, content[0]);
+	if( c ) {
+		current_message = c.id;
+
+		if( c.id == 1 ) {
+			c.content = `<canvas id="power_game" width=300 height=300></canvas>` + c.content;
+			r8_viewer.update( [c], (e, d, i) => {
+				power_game();
+			})
+			return;
+		}
+		if( c.id == 4 ) {
+			c.content = `<canvas id="bar_game" width=300 height=300></canvas>` + c.content;
+			r8_viewer.update( [c], (e, d, i) => {
+				bar_game();
+			})
+			return;
+		}
+
+		r8_viewer.update( [c], (e, d, i) => {
+			messages[ c.id ].done = 1;
+		});
+	} else {
+		r8_viewer.update( c )
+	}
 }
 
 let r8_message; // message template
 var messages_need_update = false;
-function render_messages() {
-  if( ! r8_message )
-    r8_message = rplc8("#message");
+let T = 0;
 
-  // only update if there are changes
-  if( messages_need_update ) {
-    messages_need_update = false;
-    let a = [];
-    messages.filter(a => a.visible).reverse().forEach(m => {
-      m.class = m.read ? "message_read" : "";
-      m.trim_content = m.content.split("\n")[1];
-      if( m.trim_content ) {
-        console.log(m.trim_content)
-        m.trim_content = m.trim_content.slice(0, 120);
-      }
-      a.push(m);
-    })
-    r8_message.update(a, (e, d, i) => {
-      e.addEventListener("click", function(ev) {
-        d.read = true;
-        e.classList.add("message_read");
-        populate_viewer( [d] );
-      });
-    })
-  }
+function main_game_loop() {
+	T++;
+	render_messages();
+	window.requestAnimationFrame( main_game_loop );
+}
+function render_messages() {
+
+	if( ! r8_message )
+		r8_message = rplc8("#message");
+
+	// only update if there are changes
+	if( messages_need_update ) {
+		messages_need_update = false;
+		let a = [];
+		messages.filter(a => a.visible).reverse().forEach(m => {
+			m.class = m.read ? "message_read" : "";
+			m.trim_content = m.content.split("\n")[1];
+			if( m.trim_content ) {
+				m.trim_content = m.trim_content.slice(0, 120);
+			}
+			a.push(m);
+		})
+		r8_message.update(a, (e, d, i) => {
+			e.addEventListener("click", function(ev) {
+				d.read = true;
+				// set the time we clicked on this to time showing the next message
+				d.read_time = T;
+				e.classList.add("message_read");
+				populate_viewer( [d] );
+			});
+		})
+	}
+
+
+	let nn = current_message + 1;
+	let cm = messages[ current_message ];
+	let nm = messages[ nn ];
+	// if next message and next message is not visible
+	// and current message is done
+	// and current message has waited long enough
+	// show the next message
+	if( nm && !nm.visible && cm.done && T > cm.next + (cm.read_time || 0) ) {
+		show_message( nn );
+	}
+
 }
 
-
 function start_game() {
+
 	let main_game = document.querySelector("#main_game");
 	main_game.classList.remove("hid");
 	setTimeout(function() {
 		main_game.classList.add("active");
 	}, 300);
 
-  render_messages();
-  let interval = 2000;
-  if( DEV ) {
-    interval = 100;
-  }
-  setInterval(function() {
-    render_messages();
-  }, interval);
+	show_message(0);
+	if( DEV ) {
+		messages.forEach( m => {
+			show_message(m.id);
+		});
+	}
+	window.requestAnimationFrame( main_game_loop );
 
-  show_message(1, 10);
-  show_message(0);
 }
 
 function show_message(id, timeout) {
-  if(DEV) {
-      if( ! messages[id] ) return;
-      messages[id].visible = 1;
-      messages_need_update = true;
-  } else {
-    setTimeout(function() {
-      if( ! messages[id] ) return;
-      messages[id].visible = 1;
-      messages_need_update = true;
-    }, timeout || 1000);
-  }
+	if( ! messages[id] ) return;
+	messages[id].visible = 1;
+	messages_need_update = true;
 }
 
 let r8_viewer;
 function init() {
 	r8_viewer = rplc8("#view_message");
-	populate_viewer([]);
-	let main_menu = document.querySelector("#main_menu");
-	let play_button = document.querySelector("#play_button");
-	
+		populate_viewer([]);
+		let main_menu = document.querySelector("#main_menu");
+		let play_button = document.querySelector("#play_button");
+
 	play_button.addEventListener("click", function() {
 		main_menu.classList.remove("active");	
 		setTimeout(function() {
@@ -148,9 +207,6 @@ function init() {
 			start_game();
 		}, 300);
 	})
-
-	let o = {cmd: "log", msg: "Hello World!" }
-	rpc( o, console.log, console.error );
 
 	document.addEventListener("keydown", (ev) => {
 		if( keys_down.indexOf(ev.key) == -1 ) {
