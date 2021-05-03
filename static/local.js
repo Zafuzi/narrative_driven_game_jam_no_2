@@ -417,6 +417,7 @@ function bar_game() {
 
 function binary_num_game() {
     // DEV NOTE (Rabia -> zafuzi): This game's canvas should be 600x130
+    // DEV NOTE (Rabia -> zafuzi): Can you try it cause i think that game is broken and we should get bounding client rect?
     function randbit() {
         let masks = [ 0, 0, 0, 0, 0, 0, 0, 0 ];
         let res = 0;
@@ -441,6 +442,8 @@ function binary_num_game() {
     var recs = [ 0, 0, 0, 0, 0, 0, 0, 0 ]; // If one of those is one, Trigger value by index from bitmasks
     var res1 = 0;
     var res2 = randbit();
+    var mouse_x = 0;
+    var mouse_y = 0;
     
     function update() {
         var res = 0;
@@ -465,12 +468,12 @@ function binary_num_game() {
         ctx.strokeStyle = "dodgerblue";
         
         for (var i = 0; i < recs.length; i++) {
-            ctx.strokeRect(448 - (64 * i), 64, 64, 64);
+            ctx.strokeRect((canvas.getBoundingClientRect().left - 152) - (64 * i), canvas.getBoundingClientRect().top + 64, 64, 64);
             ctx.font = "22px arial";
-            ctx.strokeText(bitmasks[i].toString(), 448 - (64 * i) + 22, 32);
+            ctx.strokeText(bitmasks[i].toString(), (canvas.getBoundingClientRect().left - 152) - (64 * i) + 22, canvas.getBoundingClientRect().top + 32);
             ctx.font = "32px arial";
-            ctx.strokeText(recs[i].toString(), 448 - (64 * i) + 22, 106);
-            ctx.strokeText(" = " + res2.toString(), 512, 106);
+            ctx.strokeText(recs[i].toString(), (canvas.getBoundingClientRect().left - 152) - (64 * i) + 22, canvas.getBoundingClientRect().top + 106);
+            ctx.strokeText(" = " + res2.toString(), (canvas.getBoundingClientRect().left - 88), canvas.getBoundingClientRect().top + 106);
         }  
     }
     
@@ -488,9 +491,12 @@ function binary_num_game() {
     }
     
     document.addEventListener("click", function(e) {
+        mouse_x = (e.clientX || e.pageX) - canvas.getBoundingClientRect().left;
+        mouse_y = (e.clientY || e.pageY) - canvas.getBoundingClientRect().top;
+        
         for (var i = 0; i < recs.length; i++) {
             // AABB for each rect...
-            if (AABB(e.clientX || e.pageX, e.clientY || e.pageY, 1, 1, 448 - (64 * i), 64, 64, 64)) {
+            if (AABB(mouse_x, mouse_y, 1, 1, (canvas.getBoundingClientRect().left - 152) - (64 * i), canvas.getBoundingClientRect().top + 64, 64, 64)) {
                 recs[i] = (recs[i] == 0) ? 1 : 0;
             }
         }
