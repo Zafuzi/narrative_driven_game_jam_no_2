@@ -365,6 +365,7 @@ function bar_game() {
     var speed = 1;
     var speed_multiplier = 30;
     var player_win_alerts = 0;
+    var frame = null;
   
     function reset_game() {
         meter_percent = 100;
@@ -408,10 +409,96 @@ function bar_game() {
     function loop() {
         update();
         render();
-        window.requestAnimationFrame(loop);
+        frame = window.requestAnimationFrame(loop);
     }
     
-    window.requestAnimationFrame(loop); // Start bar game!
+    frame = window.requestAnimationFrame(loop); // Start bar game!
+}
+
+function binary_num_game() {
+    // DEV NOTE (Rabia -> zafuzi): This game's canvas should be 600x130
+    function randbit() {
+        let masks = [ 0, 0, 0, 0, 0, 0, 0, 0 ];
+        let res = 0;
+        
+        for (var i = 0; i < masks.length; i++) {
+            masks[i] = Math.floor(Math.random() * 2);
+        }
+        
+        for (var i = 0; i < masks.length; i++) {
+            if (masks[i]) res += bitmasks[i];
+        }
+        
+        return res;
+    }
+    
+    var canvas = document.getElementById("canvas");
+    var ctx = canvas.getContext("2d");
+    var frame = null;
+    var logs = 0;
+    
+    var bitmasks = [ 1, 2, 4, 8, 16, 32, 64, 128 ];
+    var recs = [ 0, 0, 0, 0, 0, 0, 0, 0 ]; // If one of those is one, Trigger value by index from bitmasks
+    var res1 = 0;
+    var res2 = randbit();
+    
+    function update() {
+        var res = 0;
+        
+        for (var i = 0; i < recs.length; i++) {
+            if (recs[i]) {
+                res += bitmasks[i];
+            }
+        }
+        
+        res1 = res;
+        
+        if (res1 == res2) {
+            if (logs++ == 1) {
+                alert("You Win!");
+                window.location.reload(); // Restart game
+            }
+        }
+    }
+    
+    function draw() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.strokeStyle = "dodgerblue";
+        
+        for (var i = 0; i < recs.length; i++) {
+            ctx.strokeRect(448 - (64 * i), 64, 64, 64);
+            ctx.font = "22px arial";
+            ctx.strokeText(bitmasks[i].toString(), 448 - (64 * i) + 22, 32);
+            ctx.font = "32px arial";
+            ctx.strokeText(recs[i].toString(), 448 - (64 * i) + 22, 106);
+            ctx.strokeText(" = " + res2.toString(), 512, 106);
+        }
+        
+    }
+    
+    function loop() {
+		/*
+        if( messages[1].done == 1 ) {
+			window.cancelAnimationFrame( frame );
+			loop = null;
+			return;
+		}
+        */
+		update();
+		draw();
+		frame = window.requestAnimationFrame(loop);
+	}
+    
+    document.addEventListener("click", function(e) {
+        for (var i = 0; i < recs.length; i++) {
+            // AABB for each rect...
+            if (AABB(e.clientX || e.pageX, e.clientY || e.pageY, 1, 1, 448 - (64 * i), 64, 64, 64)) {
+                recs[i] = (recs[i] == 0) ? 1 : 0;
+            }
+        }
+    });
+    
+    frame = window.requestAnimationFrame(loop); // Start game!
 }
 
 // Detects collision between 2 rectangles...
