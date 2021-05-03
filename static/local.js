@@ -455,8 +455,7 @@ function binary_num_game() {
         
         if (res1 == res2) {
             if (logs++ == 1) {
-                alert("You Win!");
-                window.location.reload(); // Restart game
+                showAlert("okay", "you win!");
             }
         }
     }
@@ -472,22 +471,21 @@ function binary_num_game() {
             ctx.font = "32px arial";
             ctx.strokeText(recs[i].toString(), 448 - (64 * i) + 22, 106);
             ctx.strokeText(" = " + res2.toString(), 512, 106);
-        }
-        
+        }  
     }
     
     function loop() {
-		/*
+        /*
         if( messages[1].done == 1 ) {
-			window.cancelAnimationFrame( frame );
-			loop = null;
-			return;
-		}
+            window.cancelAnimationFrame( frame );
+            loop = null;
+            return;
+        }
         */
-		update();
-		draw();
-		frame = window.requestAnimationFrame(loop);
-	}
+        update();
+        draw();
+        frame = window.requestAnimationFrame(loop);
+    }
     
     document.addEventListener("click", function(e) {
         for (var i = 0; i < recs.length; i++) {
