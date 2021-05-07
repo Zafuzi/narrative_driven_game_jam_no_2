@@ -445,6 +445,240 @@ function bar_game() {
     window.requestAnimationFrame(loop); // Start bar game!
 }
 
+function binary_num_game() {
+    // DEV NOTE (Rabia -> zafuzi): This game's canvas should be 600x130
+    // DEV NOTE (Rabia -> zafuzi): Can you try it cause i think that game is broken and we should get bounding client rect?
+    function randbit() {
+        let masks = [ 0, 0, 0, 0, 0, 0, 0, 0 ];
+        let res = 0;
+        
+        for (var i = 0; i < masks.length; i++) {
+            masks[i] = Math.floor(Math.random() * 2);
+        }
+        
+        for (var i = 0; i < masks.length; i++) {
+            if (masks[i]) res += bitmasks[i];
+        }
+        
+        return res;
+    }
+    
+    var canvas = document.getElementById("canvas");
+    var ctx = canvas.getContext("2d");
+    var frame = null;
+    var logs = 0;
+    
+    var bitmasks = [ 1, 2, 4, 8, 16, 32, 64, 128 ];
+    var recs = [ 0, 0, 0, 0, 0, 0, 0, 0 ]; // If one of those is one, Trigger value by index from bitmasks
+    var res1 = 0;
+    var res2 = randbit();
+    var mouse_x = 0;
+    var mouse_y = 0;
+    
+    function update() {
+        var res = 0;
+        
+        for (var i = 0; i < recs.length; i++) {
+            if (recs[i]) {
+                res += bitmasks[i];
+            }
+        }
+        
+        res1 = res;
+        
+        if (res1 == res2) {
+            if (logs++ == 1) {
+                showAlert("okay", "you win!");
+            }
+        }
+    }
+    
+    function draw() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.strokeStyle = "dodgerblue";
+        
+        for (var i = 0; i < recs.length; i++) {
+            ctx.strokeRect((canvas.getBoundingClientRect().left - 152) - (64 * i), canvas.getBoundingClientRect().top + 64, 64, 64);
+            ctx.font = "22px arial";
+            ctx.strokeText(bitmasks[i].toString(), (canvas.getBoundingClientRect().left - 152) - (64 * i) + 22, canvas.getBoundingClientRect().top + 32);
+            ctx.font = "32px arial";
+            ctx.strokeText(recs[i].toString(), (canvas.getBoundingClientRect().left - 152) - (64 * i) + 22, canvas.getBoundingClientRect().top + 106);
+            ctx.strokeText(" = " + res2.toString(), (canvas.getBoundingClientRect().left - 88), canvas.getBoundingClientRect().top + 106);
+        }  
+    }
+    
+    function loop() {
+        /*
+        if( messages[1].done == 1 ) {
+            window.cancelAnimationFrame( frame );
+            loop = null;
+            return;
+        }
+        */
+        update();
+        draw();
+        frame = window.requestAnimationFrame(loop);
+    }
+    
+    document.addEventListener("click", function(e) {
+        mouse_x = (e.clientX || e.pageX) - canvas.getBoundingClientRect().left;
+        mouse_y = (e.clientY || e.pageY) - canvas.getBoundingClientRect().top;
+        
+        for (var i = 0; i < recs.length; i++) {
+            // AABB for each rect...
+            if (AABB(mouse_x, mouse_y, 1, 1, (canvas.getBoundingClientRect().left - 152) - (64 * i), canvas.getBoundingClientRect().top + 64, 64, 64)) {
+                recs[i] = (recs[i] == 0) ? 1 : 0;
+            }
+        }
+    });
+    
+    frame = window.requestAnimationFrame(loop); // Start game!
+}
+
+function keyhit() {
+    var canvas = document.getElementById("canvas");
+    var ctx = canvas.getContext("2d");
+    canvas.style.backgroundColor = "black";
+    
+    var frame = null;
+    var levels = 4;
+    var logs = 0;
+    var current_level = 0;
+    var current_key = 0;
+    var key_names = [ "up", "down", "left", "right" ];
+    var keys = [];
+    var key_pressed = "";
+    var hit = false;
+    
+    var imgs = [
+        {
+            img: new Image(),
+            img_pressed: new Image(),
+            src: "images/up.png",
+            src_pressed: "images/up_pressed.png"
+        },
+        {
+            img: new Image(),
+            img_pressed: new Image(),
+            src: "images/down.png",
+            src_pressed: "images/down_pressed.png"
+        },
+        {
+            img: new Image(),
+            img_pressed: new Image(),
+            src: "images/left.png",
+            src_pressed: "images/left_pressed.png"
+        },
+        {
+            img: new Image(),
+            img_pressed: new Image(),
+            src: "images/right.png",
+            src_pressed: "images/right_pressed.png"
+        },
+    ];
+    
+    for (var i = 0; i < imgs.length; i++) {
+        imgs[i].img.src = imgs[i].src;
+        imgs[i].img_pressed.src = imgs[i].src_pressed;
+    }        
+    
+    // Initialize game levels
+    for (var i = 0; i < levels; i++) {
+        keys[i] = [];
+        
+        for (var j = 0; j < key_names.length; j++) {
+            keys[i].push({ name: key_names[Math.floor(Math.random() * 4)], pressed: false });
+        }
+    }
+    
+    function img_from_dir(dir, pressed) {
+        if (dir == "up") {
+            if (pressed) {
+                return imgs[0].img_pressed;
+            } else {
+                return imgs[0].img;
+            }
+        } else if (dir == "down") {
+            if (pressed) {
+                return imgs[1].img_pressed;
+            } else {
+                return imgs[1].img;
+            }
+        } else if (dir == "left") {
+            if (pressed) {
+                return imgs[2].img_pressed;
+            } else {
+                return imgs[2].img;
+            }
+        } else if (dir == "right") {
+            if (pressed) {
+                return imgs[3].img_pressed;
+            } else {
+                return imgs[3].img;
+            }
+        }
+    }
+    
+    function update() {
+        if (keys[current_level]) {
+            if (hit) {
+                if (key_pressed.toLowerCase().indexOf(keys[current_level][current_key].name) > -1) {
+                    keys[current_level][current_key].pressed = true;
+                    current_key++;
+                }
+                hit = false;
+            }
+            
+            if (current_key == keys[current_level].length) {
+                current_level++;
+                hit = false;
+                current_key = 0;
+            }
+        }
+        
+        if (current_level == levels) {
+            if (logs++ == 1) {
+                showAlert("okay", "You Win!");
+                // Do something
+            }
+        }
+    }
+    
+    function render() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        
+        if (keys[current_level]) {
+            for (var i = 0; i < keys[current_level].length; i++) {
+                if (keys[current_level][i].pressed) {
+                    ctx.drawImage(img_from_dir(keys[current_level][i].name, true), 120, i * 70 + 20, 48, 48);
+                } else {
+                    ctx.drawImage(img_from_dir(keys[current_level][i].name, false), 120, i * 70 + 20, 48, 48);
+                }
+            }
+        }
+    }
+    
+    document.addEventListener("keyup", function(e) {
+        key_pressed = e.key;
+        hit = true;
+    });
+    
+    function loop() {
+        /*
+        if( messages[1].done == 1 ) {
+			window.cancelAnimationFrame( frame );
+			loop = null;
+			return;
+		}
+        */
+        update();
+        render();
+        frame = window.requestAnimationFrame(loop);
+    }
+    
+    frame = window.requestAnimationFrame(loop);
+}
+
 // Detects collision between 2 rectangles...
 function AABB(x1, y1, w1, h1, x2, y2, w2, h2) {
 	return (x1 < x2 + w2) && (x1 + w1 > x2) && (y1 < y2 + h2) && (y1 + h1 > y2);
