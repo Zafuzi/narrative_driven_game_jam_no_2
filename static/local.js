@@ -197,9 +197,9 @@ const messages = [
         visibile: 0,
         done: 0,
         content: `
-            <h3>Thanks for Playing</h3>
+            <h3>THE END</h3>
+            <p>Thanks for Playing! :)</p>
         `,
-        next: 200
     }
 ];
 
