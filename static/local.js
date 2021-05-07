@@ -115,8 +115,92 @@ const messages = [
 			<h3>SECURITY FOOTAGE DIGEST - ${Date.now()}</h3>
 			<p>Unauthorized entry into airlock D on Station 1.</p>
 			<button id="report_button">REPORT</button>
-		`
+		`,
+        next: 400
 	},
+    {
+        id: 7,
+        title: "Dr. Carson",
+        read: 0,
+        visibile: 0,
+        done: 0,
+        content: `
+            <h3>Dr. Carson<h3>
+            <p>Stacy wanted to visited Dr. Carson, But looks like isn't in his home and nobody knows where is he.</p>
+        `,
+        next: 200
+    },
+    {
+        id: 8,
+        title: "Dr. Carson",
+        read: 0,
+        visibile: 0,
+        done: 0,
+        content: `
+            <h3>Station 5</h3>
+            <p>After finding some clues, Stacy figured out that Dr. Carson is stuck somewhere in Station 5 and she is in need to resque him, You went with Stacy to the Station 5 to rescue him.</p>
+        `,
+        next: 200
+    },
+    {
+        id: 9,
+        title: "URS - AUTOMATED MONITORING",
+        read: 0,
+        visibile: 0,
+        done: 0,
+        content: `
+            <h3>Station 5 Security Gate #1</h3>
+            <p>Stacy is about to rescue Dr. Carson but she needs to unlock the first security gate, Change values of binary bar to fit the value required.</p>
+        `,
+        next: 200
+    },
+    {
+        id: 10,
+        title: "Dr. Carson",
+        read: 0,
+        visibile: 0,
+        done: 0,
+        content: `
+            <h3>Dr. Carson</h3>
+            <p>Dr. Carson told Stacy that he's fine but really needs help cause he's hardly stuck by the second security gate, He tried to get out but failed.</p>
+        `,
+        next: 200
+    },
+    {
+        id: 11,
+        title: "",
+        read: 0,
+        visibile: 0,
+        done: 0,
+        content: `
+            <h3>Dr. Carson</h3>
+            <p>Stacy told Dr. Carson that she is on her way to reach the second security gate of Station 5 to rescue him.</p>
+        `,
+        next: 200
+    },
+    {
+        id: 12,
+        title: "URS - AUTOMATED MONITORING",
+        read: 0,
+        visibile: 0,
+        done: 0,
+        content: `
+            <h3>Station 5 Security Gate #2</h3>
+            <p>Unlock the second security by pressing the responding keys.</p>
+        `,
+        next: 200
+    },
+    {
+        id: 13,
+        title: "THE END",
+        read: 0,
+        visibile: 0,
+        done: 0,
+        content: `
+            <h3>Thanks for Playing</h3>
+        `,
+        next: 200
+    }
 ];
 
 
@@ -143,7 +227,20 @@ function populate_viewer( content ) {
 			})
 			return;
 		}
-
+        if( c.id == 9 ) {
+			c.content = `<canvas id="binary_num_game" width=600 height=130></canvas>` + c.content;
+			r8_viewer.update( [c], (e, d, i) => {
+				binary_num_game();
+			})
+			return;
+		}
+        if( c.id == 12 ) {
+			c.content = `<canvas id="hitkey_game" width=300 height=300></canvas>` + c.content;
+			r8_viewer.update( [c], (e, d, i) => {
+				keyhit();
+			})
+			return;
+		}
 		r8_viewer.update( [c], (e, d, i) => {
 			messages[ d.id ].done = 1;
 		});
@@ -463,7 +560,7 @@ function binary_num_game() {
         return res;
     }
     
-    var canvas = document.getElementById("canvas");
+    var canvas = document.getElementById("binary_num_game");
     var ctx = canvas.getContext("2d");
     var frame = null;
     var logs = 0;
@@ -508,13 +605,13 @@ function binary_num_game() {
     }
     
     function loop() {
-        /*
-        if( messages[1].done == 1 ) {
+        
+        if( messages[9].done == 1 ) {
             window.cancelAnimationFrame( frame );
             loop = null;
             return;
         }
-        */
+        
         update();
         draw();
         frame = window.requestAnimationFrame(loop);
@@ -536,7 +633,7 @@ function binary_num_game() {
 }
 
 function keyhit() {
-    var canvas = document.getElementById("canvas");
+    var canvas = document.getElementById("keyhit_game");
     var ctx = canvas.getContext("2d");
     canvas.style.backgroundColor = "black";
     
@@ -664,13 +761,11 @@ function keyhit() {
     });
     
     function loop() {
-        /*
-        if( messages[1].done == 1 ) {
+        if( messages[12].done == 1 ) {
 			window.cancelAnimationFrame( frame );
 			loop = null;
 			return;
 		}
-        */
         update();
         render();
         frame = window.requestAnimationFrame(loop);
@@ -683,4 +778,3 @@ function keyhit() {
 function AABB(x1, y1, w1, h1, x2, y2, w2, h2) {
 	return (x1 < x2 + w2) && (x1 + w1 > x2) && (y1 < y2 + h2) && (y1 + h1 > y2);
 }
-
